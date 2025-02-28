@@ -6,7 +6,7 @@ import { useContext, useState } from "react";
 const ForgetPass = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useContext(AuthContexts); // Get the logged-in user from context
+  const { user } = useContext(AuthContexts);
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
