@@ -8,7 +8,9 @@ import { AuthContexts } from "../providers/AuthProvider";
 export default function Main() {
   const { theme } = useContext(AuthContexts);
   const location = useLocation();
-  const isLogin = location.pathname.includes("login", "register");
+  const isLogin =
+    location.pathname.includes("login") ||
+    location.pathname.includes("register");
   return (
     <div
       className={`rounded-xl shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-800

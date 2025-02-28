@@ -4,6 +4,8 @@ import Login from "../components/authPages/Login";
 import Main from "../layout/Main";
 import Register from "../components/authPages/Register";
 import FAQ from "../extra/Faq";
+import Services from "../components/Services/Services";
+import Doctor from "../components/doctors/Doctor";
 
 export const router = createBrowserRouter([
   {
@@ -29,6 +31,14 @@ export const router = createBrowserRouter([
       {
         path: "/faq",
         element: <FAQ />,
+      },
+      {
+        path: "/services",
+        element: <Services />,
+      },
+      {
+        path: "/doctors",
+        element: <Doctor />,
       },
     ],
   },
