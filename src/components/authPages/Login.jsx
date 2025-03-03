@@ -8,6 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { AuthContexts } from "../../providers/AuthProvider";
 import auth from "../../firebase/firebase.init";
 import { Eye, EyeOff, Mail, Lock, LogOut, Loader } from "lucide-react";
+import Swal from "sweetalert2";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -29,22 +30,19 @@ const Login = () => {
     try {
       const userCredential = await signInUser(email, password);
       setUser(userCredential.user);
-      navigate("/");
-      toast.success("Welcome back! Login successful", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
+      Swal.fire({
+        title: "Login successful",
+        text: "Welcome back! Login successful",
+        icon: "success",
       });
+      navigate("/");
     } catch (err) {
       console.error("Login error:", err.message);
       setError(err.message);
-      toast.error(err.message, {
-        position: "top-center",
-        autoClose: 5000,
-        theme: "colored",
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: `${err.message}`,
       });
     } finally {
       setIsLoading(false);
@@ -58,11 +56,11 @@ const Login = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       setUser(result.user);
-      navigate("/");
       toast.success("Welcome! Google sign-in successful", {
         position: "top-right",
         autoClose: 3000,
       });
+      navigate("/");
     } catch (err) {
       console.error("Google Sign-In error:", err.message);
       setError(err.message);

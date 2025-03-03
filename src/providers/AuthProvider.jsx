@@ -6,11 +6,17 @@ import {
 } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
 import auth from "../firebase/firebase.init";
+import useAxiosSecure from "../hooks/useAxiosSecure";
+import useAxiosPublic from "../hooks/useAxiosPublic";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AuthContexts = createContext("");
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [response, setResponse] = useState(null);
+  const axiosSecure = useAxiosSecure();
+  const axiosPublic = useAxiosPublic();
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [loader, setLoader] = useState(true);
 
@@ -64,9 +70,25 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    setLoader(true);
     const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      if (currentUser?.email) {
+        axiosSecure.post("/jwt").then((res) => setResponse(res));
+        axiosPublic
+          .post("/user", {
+            email: currentUser?.email || "demo user",
+            displayName: currentUser?.displayName || "demo displayName",
+          })
+          .then((res) => setResponse(res))
+          .catch((err) => {
+            console.error(
+              "Error adding user:",
+              err.response?.data || err.message
+            );
+          });
+      } else {
+        axiosSecure.post("/logout").then((res) => setResponse(res));
+      }
       setLoader(false);
     });
 
@@ -85,6 +107,8 @@ const AuthProvider = ({ children }) => {
     toggleTheme,
     loader,
     setLoader,
+    response,
+    setResponse,
   };
 
   return (

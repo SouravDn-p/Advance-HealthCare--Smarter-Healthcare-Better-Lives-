@@ -129,10 +129,10 @@ const Navbar = () => {
               </button>
 
               {!user ? (
-                <div className="hidden md:flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-2 ">
                   <button
                     onClick={() => navigate("/login")}
-                    className="px-4 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    className="px-4 py-2 rounded-lg bg-green-900 text-white hover:bg-gray-100 dark:hover:bg-indigo-900 transition-colors"
                   >
                     Login
                   </button>
@@ -239,7 +239,7 @@ const Navbar = () => {
                         navigate("/login");
                         setIsMenuOpen(false);
                       }}
-                      className="w-full px-4 py-2 text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                      className="w-full px-4 py-2 text-left rounded-full hover:bg-gray-100 dark:hover:bg-cyan-600 transition-colors"
                     >
                       Login
                     </button>
@@ -248,7 +248,7 @@ const Navbar = () => {
                         navigate("/register");
                         setIsMenuOpen(false);
                       }}
-                      className="w-full px-4 py-2 text-left rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                      className="w-full px-4 py-2 text-left rounded-full bg-blue-600 hover:bg-blue-700 text-white transition-colors"
                     >
                       Register
                     </button>

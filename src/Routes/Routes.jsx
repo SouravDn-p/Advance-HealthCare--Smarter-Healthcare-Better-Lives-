@@ -6,6 +6,7 @@ import Register from "../components/authPages/Register";
 import FAQ from "../extra/Faq";
 import Services from "../components/Services/Services";
 import Doctor from "../components/doctors/Doctor";
+import ErrorPage from "../components/shared/ErrorPage";
 
 export const router = createBrowserRouter([
   {
@@ -22,7 +23,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/login",
-        element: <Login />,
+        element: <Login/>,
       },
       {
         path: "/register",
@@ -41,5 +42,9 @@ export const router = createBrowserRouter([
         element: <Doctor />,
       },
     ],
+  },
+  {
+    path: "*",
+    element: <ErrorPage />,
   },
 ]);

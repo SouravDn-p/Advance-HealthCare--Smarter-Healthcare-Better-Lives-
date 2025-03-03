@@ -1,7 +1,8 @@
 import { Video, Pill, TestTube, Umbrella, Settings } from "lucide-react";
 import { useContext } from "react";
+import Lottie from "lottie-react";
 import { AuthContexts } from "../../providers/AuthProvider";
-
+import service from "../../../public/service.json";
 const ServicesSection = () => {
   const { theme } = useContext(AuthContexts);
 
@@ -48,12 +49,12 @@ const ServicesSection = () => {
       className={`py-12 px-4 md:px-8 transition-all duration-300 
         ${
           theme === "dark"
-            ? "bg-gray-900 text-gray-200"
-            : "bg-gray-50 text-gray-900"
+            ? "bg-gray-800 text-gray-200"
+            : "bg-gradient-to-r from-[#D3E2CD] to-[#e8f0e5] text-gray-900 "
         }`}
     >
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center ">
           <h2
             className={`text-3xl md:text-4xl font-bold transition-colors 
               ${theme === "dark" ? "text-white" : "text-gray-900"}`}
@@ -68,7 +69,11 @@ const ServicesSection = () => {
             Comprehensive healthcare solutions at your fingertips
           </p>
         </div>
-
+        <Lottie
+          className="h-40 pr-12 my-12"
+          animationData={service}
+          loop={true}
+        />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {services.map((service, index) => (
             <div
