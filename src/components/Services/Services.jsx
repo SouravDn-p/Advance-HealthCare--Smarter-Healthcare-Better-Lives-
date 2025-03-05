@@ -95,7 +95,6 @@ const ServicesSection = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
         <div className="text-center mb-14">
           <h2
             className={`text-4xl md:text-5xl font-bold tracking-tight ${
@@ -113,7 +112,6 @@ const ServicesSection = () => {
           </p>
         </div>
 
-        {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services.map((service, index) => (
             <div
@@ -182,12 +180,28 @@ const ServicesSection = () => {
           ))}
         </div>
 
-        {/* Statistics Section */}
         <div
           className={`mt-16 bg-opacity-30 py-12 px-6 md:px-12 rounded-xl text-center ${
             theme === "dark" ? "bg-gray-800" : "bg-gray-100"
           }`}
         >
+          <div className="text-center mb-14">
+            <h2
+              className={`text-4xl md:text-5xl font-bold tracking-tight ${
+                theme === "dark" ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Our Impact in Numbers
+            </h2>
+            <p
+              className={`mt-4 text-lg md:text-xl ${
+                theme === "dark" ? "text-gray-300" : "text-gray-600"
+              }`}
+            >
+              We're proud of the difference we've made in healthcare delivery
+              and patient outcomes
+            </p>
+          </div>
           <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="flex flex-col items-center">
@@ -208,6 +222,20 @@ const ServicesSection = () => {
                 </p>
               </div>
             ))}
+          </div>
+          <div className="mt-12 text-center">
+            <p
+              className={` max-w-2xl mx-auto ${
+                theme === "dark" ? "text-gray-400" : "text-gray-600"
+              }`}
+            >
+              Our commitment to excellence has helped us achieve these
+              milestones, and we continue to strive for better healthcare
+              outcomes every day.
+            </p>
+            <button className="mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors duration-300">
+              Learn More About Our Impact
+            </button>
           </div>
         </div>
       </div>

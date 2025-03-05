@@ -5,11 +5,10 @@ import {
   FileText,
   ArrowRight,
 } from "lucide-react";
-import { useContext } from "react";
-import { AuthContexts } from "../../providers/AuthProvider";
+import useAuth from "../../hooks/useAuth";
 
 const HowItWorks = () => {
-  const { theme } = useContext(AuthContexts);
+  const { theme, user } = useAuth();
   const steps = [
     {
       icon: <UserPlus className="w-12 h-12" />,
@@ -128,7 +127,7 @@ const HowItWorks = () => {
 
         <div className="mt-16 text-center">
           <button className="inline-flex items-center px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-300 transform hover:scale-105">
-            Get Started Now
+            {user ? "Book a Consultation" : "Get Started Now With SignUp "}
             <ArrowRight className="ml-2 w-5 h-5" />
           </button>
         </div>

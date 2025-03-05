@@ -15,6 +15,7 @@ export const AuthContexts = createContext("");
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [response, setResponse] = useState(null);
+  const [doctors, setDoctors] = useState(null);
   const axiosSecure = useAxiosSecure();
   const axiosPublic = useAxiosPublic();
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
@@ -109,6 +110,8 @@ const AuthProvider = ({ children }) => {
     setLoader,
     response,
     setResponse,
+    doctors,
+    setDoctors,
   };
 
   return (
