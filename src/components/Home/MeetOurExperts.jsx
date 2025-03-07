@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import {
   Award,
   MessageCircle,
@@ -6,379 +9,112 @@ import {
   Users,
   Clock,
   ArrowRight,
+  HospitalIcon,
+  X,
+  CheckCircle,
+  MapPin,
+  Phone,
 } from "lucide-react";
-import { useContext } from "react";
-import { AuthContexts } from "../../providers/AuthProvider";
-
-const doctors = [
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b001" },
-    "name": "Dr. Sarah Johnson",
-    "specialty": "Cardiology",
-    "experience": "15 years experience",
-    "image": "https://images.pexels.com/photos/4167542/pexels-photo-4167542.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-    "rating": 4.9,
-    "patients": "2,000+",
-    "availability": "Mon - Fri",
-    "achievements": [
-      "Best Cardiology Award 2023",
-      "Published 24 Research Papers"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b002" },
-    "name": "Dr. Mark Benson",
-    "specialty": "Neurology",
-    "experience": "12 years experience",
-    "image": "https://img.freepik.com/free-photo/doctor-with-his-arms-crossed-white-background_1368-5790.jpg?t=st=1741025282~exp=1741028882~hmac=5e8ffc3f28dce8ab96ebae617375885a992faddf1e952621bfacee437d297347&w=740",
-    "rating": 4.8,
-    "patients": "1,800+",
-    "availability": "Mon - Sat",
-    "achievements": [
-      "Neurology Excellence Award",
-      "International Speaker"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b003" },
-    "name": "Dr. Emily Carter",
-    "specialty": "Dermatology",
-    "experience": "10 years experience",
-    "image": "https://img.freepik.com/free-photo/woman-medic-uniform-portrait_23-2147648683.jpg?t=st=1741025592~exp=1741029192~hmac=0db3776a916f4633feefc21474111a3f4791ea23827fa8ecd8a8f5c3bf6c25c6&w=740",
-    "rating": 4.9,
-    "patients": "1,500+",
-    "availability": "Tue - Sat",
-    "achievements": [
-      "Skin Care Innovation Award",
-      "Celebrity Dermatologist"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b004" },
-    "name": "Dr. David Lee",
-    "specialty": "Dermatology",
-    "experience": "18 years",
-    "image": "https://media.istockphoto.com/id/2158610739/photo/handsome-male-doctor-with-stethoscope-over-neck-working-while-looking-at-camera-in-the.jpg?s=612x612&w=0&k=20&c=WWd2ujTaKfM7VU47_z_E-2YPIGlEEvJa4qVgavD4a70=",
-    "rating": 4.9,
-    "patients": "3,000+",
-    "availability": "Mon - Fri",
-    "achievements": [
-      "Skin Health Expert",
-      "Inventor of Advanced Skin Cream"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b005" },
-    "name": "Dr. Aisha Khan",
-    "specialty": "Orthopedics",
-    "experience": "14 years",
-    "image": "http://media.istockphoto.com/id/2157055065/photo/female-doctor-portrait-and-smile-with-tablet-in-hospital-or-workplace-with-lens-flare.jpg?s=612x612&w=0&k=20&c=VEU22yaVyv7Dsr9CiPRFgK_a7yrVzenvG8-C4p2_L44=",
-    "rating": 4.6,
-    "patients": "1,500+",
-    "availability": "Wed - Sun",
-    "achievements": [
-      "Sports Injury Specialist",
-      "Published 8 Research Papers"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b006" },
-    "name": "Dr. Robert Garcia",
-    "specialty": "Ophthalmology",
-    "experience": "20 years",
-    "image": "https://media.istockphoto.com/id/1820379319/photo/healthcare-doctor-and-man-with-arms-crossed-at-hospital-with-smile-for-support-service-and.jpg?s=612x612&w=0&k=20&c=26JOTuHgbpIRxZYOBakMRFFZt9BxF-JtL97LErFMBAU=",
-    "rating": 4.8,
-    "patients": "3,500+",
-    "availability": "Mon - Fri",
-    "achievements": [
-      "Vision Care Pioneer",
-      "Developed New Laser Surgery Technique"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b007" },
-    "name": "Dr. Jessica Williams",
-    "specialty": "Gastroenterology",
-    "experience": "11 years",
-    "image": "https://media.istockphoto.com/id/1820378768/photo/healthcare-doctor-and-black-man-with-arms-crossed-at-hospital-with-smile-for-support-service.jpg?s=612x612&w=0&k=20&c=HCog1ZKbnzCJvu1NuZsiqmTg_Jav-KYkr9xbvVpU7VA=",
-    "rating": 4.7,
-    "patients": "1,900+",
-    "availability": "Tue - Sat",
-    "achievements": [
-      "Digestive Health Advocate",
-      "Published 12 Articles"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b008" },
-    "name": "Dr. Michael Brown",
-    "specialty": "Psychiatry",
-    "experience": "16 years",
-    "image": "https://media.istockphoto.com/id/1785918657/photo/portrait-of-doctor-with-smile-confidence-and-hospital-employee-with-care-support-and-trust.jpg?s=612x612&w=0&k=20&c=edx0LITtjis5zxtRZIbx24yholpv4oNicE-e69guius=",
-    "rating": 4.9,
-    "patients": "2,800+",
-    "availability": "Mon - Fri",
-    "achievements": [
-      "Mental Health Expert",
-      "Author of Bestselling Book"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b009" },
-    "name": "Dr. Priya Patel",
-    "specialty": "Endocrinology",
-    "experience": "13 years",
-    "image": "https://media.istockphoto.com/id/1301595548/photo/female-doctor-stock-photo.jpg?s=612x612&w=0&k=20&c=s9kTlQCWJcYmCyMwYwJfTq7jiC1NfHaXzZyGhi4fRHM=",
-    "rating": 4.8,
-    "patients": "2,200+",
-    "availability": "Wed - Sun",
-    "achievements": [
-      "Diabetes Specialist",
-      "Developed New Insulin Therapy"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b010" },
-    "name": "Dr. Kevin Smith",
-    "specialty": "Pulmonology",
-    "experience": "19 years",
-    "image": "https://media.istockphoto.com/id/2025170211/photo/cheerful-mature-doctor-posing-and-smiling-at-camera-healthcare-and-medicine.jpg?s=612x612&w=0&k=20&c=SMLcomEgL1ZOrnfN5x_u7b9juouFzAmxb-TNE6si5CI=",
-    "rating": 4.7,
-    "patients": "3,200+",
-    "availability": "Mon - Sat",
-    "achievements": [
-      "Respiratory Health Pioneer",
-      "Published 15 Research Papers"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b011" },
-    "name": "Dr. Laura Wilson",
-    "specialty": "Urology",
-    "experience": "17 years",
-    "image": "https://media.istockphoto.com/id/1969864400/photo/tablet-portrait-woman-or-mature-doctor-smile-for-healthcare-medicine-or-gp-with-digital.jpg?s=612x612&w=0&k=20&c=3C60Nmj4iO33_ux-BqEVtJy0TziAAe83ErsnHSCfPSU=",
-    "rating": 4.9,
-    "patients": "2,900+",
-    "availability": "Mon - Fri",
-    "achievements": [
-      "Urological Surgery Expert",
-      "Developed Minimally Invasive Technique"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b012" },
-    "name": "Dr. James Taylor",
-    "specialty": "Hematology",
-    "experience": "12 years",
-    "image": "https://media.istockphoto.com/id/2150448539/photo/hansome-doctor-looking-at-camera.jpg?s=612x612&w=0&k=20&c=6pzMIv276AGi_c8kJNZHy6KInEQIagog9Dx9e-GuAkM=",
-    "rating": 4.8,
-    "patients": "2,100+",
-    "availability": "Tue - Sat",
-    "achievements": [
-      "Blood Disorder Specialist",
-      "Published 9 Articles"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b014" },
-    "name": "Dr. Christopher Thomas",
-    "specialty": "Rheumatology",
-    "experience": "14 years",
-    "image": "https://media.istockphoto.com/id/2096119485/photo/doctor-talking-with-patient-in-hospital-corridor-handsome-doctor-with-gray-hair-holding.jpg?s=612x612&w=0&k=20&c=-sd1rINHBtkF8NBpxbrb_hK0pLDIeWE-7k1WIn7Rqjk=",
-    "rating": 4.9,
-    "patients": "2,300+",
-    "availability": "Wed - Sun",
-    "achievements": [
-      "Joint Pain Specialist",
-      "Published 11 Research Papers"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b015" },
-    "name": "Dr. Elizabeth Jackson",
-    "specialty": "Nephrology",
-    "experience": "18 years",
-    "image": "https://media.istockphoto.com/id/2079306898/photo/doctor-patient-and-consultation-with-conversation-for-healthcare-people-in-office-with-advice.jpg?s=612x612&w=0&k=20&c=dfNVIQJBPwi-BjoWTmQo393nvycwOczXufXuKAdq4s8=",
-    "rating": 4.6,
-    "patients": "3,100+",
-    "availability": "Mon - Fri",
-    "achievements": [
-      "Kidney Disease Expert",
-      "Developed New Dialysis Technique"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b016" },
-    "name": "Dr. Matthew White",
-    "specialty": "Infectious Disease",
-    "experience": "16 years",
-    "image": "https://media.istockphoto.com/id/2192903246/photo/concerned-doctor-explains-the-treatment-plan-to-a-patient-experiencing-abdominal-discomfort.jpg?s=612x612&w=0&k=20&c=KXGGUuhAJBI_Bx_qEbCp24GrD5MHzjLbaK0_DakbGes=",
-    "rating": 4.8,
-    "patients": "2,700+",
-    "availability": "Tue - Sat",
-    "achievements": [
-      "Infection Control Specialist",
-      "Published 13 Articles"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b017" },
-    "name": "Dr. Brittany Harris",
-    "specialty": "Allergy and Immunology",
-    "experience": "10 years",
-    "image": "https://media.istockphoto.com/id/1772453030/photo/comprehensive-care-planning-cheerful-senior-woman-doctor-in-white-coat-with-stethoscope.jpg?s=612x612&w=0&k=20&c=efP6fxh4cZUT81FKDAiQqx7qEboif3OvbtbuT0lRueA=",
-    "rating": 4.7,
-    "patients": "1,800+",
-    "availability": "Mon - Fri",
-    "achievements": [
-      "Allergy Treatment Expert",
-      "Developed New Immunotherapy"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b018" },
-    "name": "Dr. Joseph Martin",
-    "specialty": "Emergency Medicine",
-    "experience": "15 years",
-    "image": "https://media.istockphoto.com/id/2167960672/photo/portrait-of-caucasian-middle-eastern-multiracial-ethnicity-mature-man-medical-doctor-surgeon.jpg?s=612x612&w=0&k=20&c=aagBF3lNZYrN6ra3F2sygHJvP0sO3ZAOtCm9jz7DasE=",
-    "rating": 4.9,
-    "patients": "4,000+",
-    "availability": "24/7",
-    "achievements": [
-      "Trauma Care Specialist",
-      "Published 18 Research Papers"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b019" },
-    "name": "Dr. Sarah Thompson",
-    "specialty": "Family Medicine",
-    "experience": "12 years",
-    "image": "https://media.istockphoto.com/id/1997397032/photo/male-doctor-taking-notes-while-working-on-laptop-in-the-office.jpg?s=612x612&w=0&k=20&c=zmqQKs-IMzxagtZzyMZOaYwv9FlOQN9nRuj4_en-1HE=",
-    "rating": 4.8,
-    "patients": "2,500+",
-    "availability": "Mon - Sat",
-    "achievements": [
-      "Primary Care Provider",
-      "Published 7 Articles"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b020" },
-    "name": "Dr. Anthony Garcia",
-    "specialty": "Geriatrics",
-    "experience": "20 years",
-    "image": "https://media.istockphoto.com/id/1635982957/photo/happy-asian-man-doctor-and-arms-crossed-in-confidence-of-healthcare-consultant-at-the-office.jpg?s=612x612&w=0&k=20&c=h6afWku3v9XVNVtZ86zYn0nIH8lOw-3v4rdIIt_VwA8=",
-    "rating": 4.7,
-    "patients": "3,500+",
-    "availability": "Mon - Fri",
-    "achievements": [
-      "Elderly Care Specialist",
-      "Published 14 Research Papers"
-    ]
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b021" },
-    "name": "Dr. Linda Rodriguez",
-    "specialty": "General Physician",
-    "experience": "11 years",
-    "image": "https://media.istockphoto.com/id/2193298525/photo/portrait-of-a-smiling-female-doctor-looking-at-camera.jpg?s=612x612&w=0&k=20&c=v7RzSTtNuC7mOQiXiFRVrEDDVNCtE_Oqw6J1gscXrW0=",
-    "rating": 4.6,
-    "patients": "2,200+",
-    "availability": "Mon - Sat",
-    "achievements": [
-      "Community Health Advocate",
-      "Published 5 Articles"
-    ],
-    "hospital": "Popular Medical College Hospital",
-    "consultation_fee": "$125"
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b022" },
-    "name": "Dr. Paul Wilson",
-    "specialty": "Gynae & Obs",
-    "experience": "17 years",
-    "image": "https://media.istockphoto.com/id/1772458949/photo/happy-confident-old-male-doctor-in-white-coat-with-stethoscope-and-crossed-arms-on-chest.jpg?s=612x612&w=0&k=20&c=v9emv-EwclBpVboJsOmjw1zWcfT9u0uqWSsJ_B47e2M=",
-    "rating": 4.9,
-    "patients": "3,000+",
-    "availability": "Tue - Sun",
-    "achievements": [
-      "Women's Health Pioneer",
-      "Developed Advanced Surgical Technique"
-    ],
-    "hospital": "Popular Medical College Hospital",
-    "consultation_fee": "$155"
-    
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b023" },
-    "name": "Dr. Maria Martinez",
-    "specialty": "Internal Medicine",
-    "experience": "19 years",
-    "image":
-      "https://media.istockphoto.com/id/1806602692/photo/portrait-of-a-female-doctor-holding-a-clipboard.jpg?s=612x612&w=0&k=20&c=873RCAa3gpF_bhsgfOfITcaHup3AULqR4WO0szMZyY0=",
-    "rating": 4.8,
-    "patients": "3,300+",
-    "availability": "Mon - Fri",
-    "achievements": ["Adult Health Specialist", "Published 16 Research Papers"],
-    "hospital": "Bangabandhu Sheikh Mujib Medical University: BSMMU",
-    "consultation_fee": "$125"
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b024" },
-    "name": "Dr. Richard Davis",
-    "specialty": "Nutrition & Food Science",
-    "experience": "13 years",
-    "image":
-      "https://media.istockphoto.com/id/1959485915/photo/a-smiling-young-male-doctor-is-working-in-the-office-of-the-clinic-using-a-laptop-sitting-in.jpg?s=612x612&w=0&k=20&c=owRFBLIJVl4zpCb5sJMBmMNPiUP9PpBI0I9hWq0XWfM=",
-    "rating": 4.7,
-    "patients": "2,600+",
-    "availability": "Wed - Sat",
-    "achievements": [
-      "Weight Management Expert",
-      "Author of Healthy Eating Cookbook"
-    ],
-    "hospital": "Dhaka Medical College and Hospital",
-    "consultation_fee": "$125"
-  },
-  {
-    "_id": { "$oid": "65e6a9f7c3a4b3d2f8a1b025" },
-    "name": "Dr. Susan Garcia",
-    "specialty": "Dentistry",
-    "experience": "15 years",
-    "image":
-      "https://media.istockphoto.com/id/2153720801/photo/portrait-of-brunette-european-young-woman-doctor-with-stethoscope.jpg?s=612x612&w=0&k=20&c=1umAir8oLQj7H2pJJFp1f21066An0hJg5B801YVcpcM=",
-    "rating": 4.9,
-    "patients": "2,900+",
-    "availability": "Mon - Fri",
-    "achievements": [
-      "Cosmetic Dentistry Pioneer",
-      "Developed New Dental Implant Technique"
-    ]
-  },
-];
+import useAuth from "../../hooks/useAuth";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
 
 const MeetOurExperts = () => {
-  const { theme } = useContext(AuthContexts);
+  const { doctors, theme, user } = useAuth();
+  const axiosPublic = useAxiosPublic();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [appointmentDate, setAppointmentDate] = useState("");
+  const [appointmentTime, setAppointmentTime] = useState("");
+  const [appointmentType, setAppointmentType] = useState("in-person");
+  const [formStep, setFormStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleOpenModal = (doctor) => {
+    setSelectedDoctor(doctor);
+    setIsModalOpen(true);
+    setFormStep(1);
+    setIsSuccess(false);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedDoctor(null);
+    setAppointmentDate("");
+    setAppointmentTime("");
+    setFormStep(1);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    // axiosPublic
+    //   .get(`/doctor/${selectedDoctor._id}`)
+    //   .then((res) => console.log(res.data));
+    // console.log("appointmentID", selectedDoctor._id);
+    // console.log("selectedDoctor.name", selectedDoctor.name);
+    // console.log("appointmentDate", appointmentDate);
+    // console.log("appointmentTime", appointmentTime);
+    // console.log("appointmentType", appointmentType);
+
+    const newAppointment = {
+      patientName: user?.displayName,
+      patientEmail: user?.email,
+      doctorName: selectedDoctor.name,
+      appointmentDate: appointmentDate,
+      appointmentTime: appointmentTime,
+      appointmentType: appointmentType,
+      doctorId: selectedDoctor._id,
+      selectedDoctor: selectedDoctor,
+    };
+
+    try {
+      const response = await axiosPublic.post(`/appointment`, newAppointment);
+      console.log("Appointment Created:", response.data);
+    } catch (error) {
+      console.error(
+        "Error creating appointment:",
+        error.response?.data || error.message
+      );
+    }
+
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSuccess(true);
+    }, 1500);
+  };
+
+  const timeSlots = [
+    "09:00 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "01:00 PM",
+    "02:00 PM",
+    "03:00 PM",
+    "04:00 PM",
+  ];
+
   return (
     <section
-      className={`py-16 bg-gradient-to-b ${
+      className={`py-16 ${
         theme === "dark"
-          ? "bg-gray-800 text-gray-200"
-          : "bg-gradient-to-r from-[#D3E2CD] to-[#e8f0e5] text-gray-900 "
-      }`}
+          ? "bg-gradient-to-b from-gray-900 to-gray-800 text-gray-200"
+          : "bg-gradient-to-r from-[#D3E2CD] to-[#e8f0e5] text-gray-900"
+      } transition-all relative duration-300`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2
             className={`text-3xl md:text-4xl font-bold ${
               theme === "dark" ? "text-white" : "text-gray-900"
-            } mb-4`}
+            } mb-4 relative inline-block`}
           >
             Meet Our Expert Doctors
+            <span className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500 transform scale-x-0 transition-transform duration-500 group-hover:scale-x-100"></span>
           </h2>
           <p
-            className={`text-lg  ${
+            className={`text-lg ${
               theme === "dark" ? "text-gray-400" : "text-gray-600"
             } max-w-2xl mx-auto`}
           >
@@ -387,74 +123,106 @@ const MeetOurExperts = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {doctors.map((doctor, index) => (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 ">
+          {doctors?.slice(0, 3).map((doctor, index) => (
             <div
               key={index}
-              className="group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden"
+              className={`group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-2 ${
+                theme === "dark"
+                  ? "border border-gray-700"
+                  : "border border-gray-100"
+              }`}
             >
               <div className="relative overflow-hidden">
                 <div className="aspect-w-3 aspect-h-2">
                   <img
                     src={doctor.image || "/placeholder.svg"}
                     alt={doctor.name}
-                    className="w-full  object-cover object-center group-hover:scale-105 transition-transform duration-300 h-96"
+                    className="w-full object-cover object-center group-hover:scale-105 transition-transform duration-700 h-64"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <div className="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-full px-3 py-1 flex items-center gap-1 shadow-md">
+
+                <div className="absolute top-4 right-4 bg-white dark:bg-gray-800 rounded-full px-3 py-1 flex items-center gap-1 shadow-md transform group-hover:scale-110 transition-transform duration-300">
                   <Star className="w-4 h-4 text-yellow-400 fill-current" />
                   <span className="text-sm font-semibold">{doctor.rating}</span>
+                </div>
+
+                <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <button className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-300">
+                    <MessageCircle className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  </button>
+                  <button className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors duration-300">
+                    <Phone className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  </button>
                 </div>
               </div>
 
               <div className="p-6">
                 <div className="mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                     {doctor.name}
                   </h3>
-                  <p className="text-blue-600 dark:text-blue-400 font-medium">
+
+                  <div className="mb-3">
+                    <div className="flex items-center gap-2">
+                      <HospitalIcon className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {doctor.hospital}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="inline-block px-3 py-1 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-600 dark:text-blue-400 font-medium text-sm">
                     {doctor.specialty}
-                  </p>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                  <div className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                    <Clock className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
                       {doctor.experience}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
+                  <div className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+                    <Users className="w-4 h-4 text-indigo-500 dark:text-indigo-400" />
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
                       {doctor.patients} Patients
                     </span>
                   </div>
                 </div>
 
                 <div className="mb-6">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <Award className="w-5 h-5 text-yellow-500" />
                     <span className="text-sm font-medium text-gray-900 dark:text-white">
                       Achievements
                     </span>
                   </div>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-1">
+                  <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
                     {doctor.achievements.map((achievement, i) => (
-                      <li key={i} className="flex items-start gap-2">
-                        <span className="text-blue-500 mt-1">•</span>
-                        {achievement}
+                      <li
+                        key={i}
+                        className="flex items-start gap-2 pl-2 border-l-2 border-blue-200 dark:border-blue-800"
+                      >
+                        <span className="text-blue-500 dark:text-blue-400">
+                          {achievement}
+                        </span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
                 <div className="flex gap-4">
-                  <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-300 flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => handleOpenModal(doctor)}
+                    className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-3 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg transform hover:-translate-y-1"
+                  >
                     <Calendar className="w-4 h-4" />
                     Book Appointment
                   </button>
-                  <button className="p-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 border border-blue-600 dark:border-blue-400 rounded-lg transition-colors duration-300">
+                  <button className="p-3 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 border border-blue-200 dark:border-blue-800 hover:border-blue-300 dark:hover:border-blue-700 rounded-lg transition-all duration-300 hover:bg-blue-50 dark:hover:bg-blue-900/20">
                     <MessageCircle className="w-5 h-5" />
                   </button>
                 </div>
@@ -466,12 +234,281 @@ const MeetOurExperts = () => {
         <div className="mt-12 text-center">
           <a
             href="/doctors"
-            className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold group"
+            className="inline-flex items-center px-6 py-3 rounded-lg bg-white dark:bg-gray-800 shadow-md hover:shadow-lg text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold group transition-all duration-300 transform hover:-translate-y-1"
           >
             View All Doctors
-            <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-300" />
           </a>
         </div>
+
+        {isModalOpen && selectedDoctor && (
+          <div
+            className="absolute fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50 p-4"
+            onClick={(e) => e.target === e.currentTarget && handleCloseModal()}
+          >
+            <div
+              role="dialog"
+              aria-labelledby="modal-title"
+              className={`bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md relative overflow-hidden transition-all duration-300 transform ${
+                isModalOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"
+              }`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative">
+                <div className="h-24 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                <div className="absolute top-12 left-6 flex items-end">
+                  <div className="w-24 h-24 rounded-full border-4 border-white dark:border-gray-800 overflow-hidden bg-white">
+                    <img
+                      src={selectedDoctor.image || "/placeholder.svg"}
+                      alt={selectedDoctor.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="ml-4 pb-2">
+                    <h3 className="text-xl font-bold text-white">
+                      {selectedDoctor.name}
+                    </h3>
+                    <p className="text-blue-100">{selectedDoctor.specialty}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleCloseModal}
+                  className="absolute top-3 right-3 text-white hover:text-gray-200 bg-black/20 hover:bg-black/30 rounded-full p-1 transition-colors duration-200"
+                  aria-label="Close modal"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="p-6 pt-16">
+                {isSuccess ? (
+                  <div className="text-center py-8">
+                    <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-4">
+                      <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                      Appointment Confirmed!
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-6">
+                      Your appointment with {selectedDoctor.name} has been
+                      scheduled for {appointmentDate} at {appointmentTime}.
+                    </p>
+                    <button
+                      onClick={handleCloseModal}
+                      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-300"
+                    >
+                      Done
+                    </button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit}>
+                    <div className="flex items-center mb-6">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          formStep >= 1
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                        }`}
+                      >
+                        1
+                      </div>
+                      <div
+                        className={`flex-1 h-1 mx-2 ${
+                          formStep >= 2
+                            ? "bg-blue-600"
+                            : "bg-gray-200 dark:bg-gray-700"
+                        }`}
+                      ></div>
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          formStep >= 2
+                            ? "bg-blue-600 text-white"
+                            : "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                        }`}
+                      >
+                        2
+                      </div>
+                    </div>
+
+                    {formStep === 1 ? (
+                      <div className="space-y-4">
+                        <div className="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg mb-6">
+                          <MapPin className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0 mt-1" />
+                          <div>
+                            <h4 className="font-medium text-gray-900 dark:text-white">
+                              Hospital
+                            </h4>
+                            <p className="text-gray-600 dark:text-gray-300">
+                              {selectedDoctor.hospital}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="space-y-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Appointment Date
+                            </label>
+                            <input
+                              type="date"
+                              value={appointmentDate}
+                              onChange={(e) =>
+                                setAppointmentDate(e.target.value)
+                              }
+                              min={new Date().toISOString().split("T")[0]}
+                              className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
+                              required
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                              Appointment Type
+                            </label>
+                            <div className="grid grid-cols-2 gap-3">
+                              <button
+                                type="button"
+                                className={`px-4 py-2 rounded-lg border ${
+                                  appointmentType === "in-person"
+                                    ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400"
+                                    : "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
+                                }`}
+                                onClick={() => setAppointmentType("in-person")}
+                              >
+                                In-Person
+                              </button>
+                              <button
+                                type="button"
+                                className={`px-4 py-2 rounded-lg border ${
+                                  appointmentType === "virtual"
+                                    ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400"
+                                    : "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
+                                }`}
+                                onClick={() => setAppointmentType("virtual")}
+                              >
+                                Virtual
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-6 flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => setFormStep(2)}
+                            disabled={!appointmentDate}
+                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Next
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Available Time Slots
+                          </label>
+                          <div className="grid grid-cols-3 gap-2">
+                            {timeSlots.map((time) => (
+                              <button
+                                key={time}
+                                type="button"
+                                className={`px-2 py-2 text-sm rounded-lg border ${
+                                  appointmentTime === time
+                                    ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400"
+                                    : "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"
+                                }`}
+                                onClick={() => setAppointmentTime(time)}
+                              >
+                                {time}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
+                          <h4 className="font-medium text-gray-900 dark:text-white mb-2">
+                            Appointment Summary
+                          </h4>
+                          <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
+                            <li className="flex justify-between">
+                              <span>Doctor:</span>
+                              <span className="font-medium">
+                                {selectedDoctor.name}
+                              </span>
+                            </li>
+                            <li className="flex justify-between">
+                              <span>Date:</span>
+                              <span className="font-medium">
+                                {appointmentDate}
+                              </span>
+                            </li>
+                            <li className="flex justify-between">
+                              <span>Time:</span>
+                              <span className="font-medium">
+                                {appointmentTime}
+                              </span>
+                            </li>
+                            <li className="flex justify-between">
+                              <span>Type:</span>
+                              <span className="font-medium capitalize">
+                                {appointmentType}
+                              </span>
+                            </li>
+                          </ul>
+                        </div>
+
+                        <div className="mt-6 flex justify-between">
+                          <button
+                            type="button"
+                            onClick={() => setFormStep(1)}
+                            className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300"
+                          >
+                            Back
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={!appointmentTime || isSubmitting}
+                            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <svg
+                                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                  ></circle>
+                                  <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                  ></path>
+                                </svg>
+                                Processing...
+                              </>
+                            ) : (
+                              "Confirm Booking"
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </form>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

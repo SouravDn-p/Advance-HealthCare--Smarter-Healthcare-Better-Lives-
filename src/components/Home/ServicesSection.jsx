@@ -4,7 +4,7 @@ import Lottie from "lottie-react";
 import { AuthContexts } from "../../providers/AuthProvider";
 import service from "../../../public/service.json";
 const ServicesSection = () => {
-  const { theme } = useContext(AuthContexts);
+  const { theme, user } = useContext(AuthContexts);
 
   const services = [
     {
@@ -123,7 +123,6 @@ const ServicesSection = () => {
               >
                 {service.description}
               </p>
-
               <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transform translate-x-full group-hover:translate-x-0 transition-all duration-300">
                 <svg
                   className={`${

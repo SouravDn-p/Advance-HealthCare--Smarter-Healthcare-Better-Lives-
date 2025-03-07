@@ -7,6 +7,11 @@ import FAQ from "../extra/Faq";
 import Services from "../components/Services/Services";
 import Doctor from "../components/doctors/Doctor";
 import ErrorPage from "../components/shared/ErrorPage";
+import Appointments from "../components/appointments/Appointments";
+import MedicalRecord from "../components/medicalRecords/MedicalRecord";
+import Telemedicine from "../components/telemedicine/Telemedicine";
+import AIDiagnosis from "../components/aiDiagnosis/AiDiagnosis";
+import EmergencyServices from "../components/emargency/EmergencyServices";
 
 export const router = createBrowserRouter([
   {
@@ -23,7 +28,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/login",
-        element: <Login/>,
+        element: <Login />,
       },
       {
         path: "/register",
@@ -40,6 +45,32 @@ export const router = createBrowserRouter([
       {
         path: "/doctors",
         element: <Doctor />,
+      },
+      {
+        path: "/emergency",
+        element: <EmergencyServices />,
+      },
+      {
+        path: "/doctors/:specialty",
+        element: <Doctor />,
+        loader: ({ params }) =>
+          fetch(`http://localhost:3000/doctors/${params.specialty}`),
+      },
+      {
+        path: "dashboard/appointments",
+        element: <Appointments />,
+      },
+      {
+        path: "dashboard/medical-records",
+        element: <MedicalRecord />,
+      },
+      {
+        path: "dashboard/consultation",
+        element: <Telemedicine />,
+      },
+      {
+        path: "dashboard/AIDiagnosis",
+        element: <AIDiagnosis />,
       },
     ],
   },
