@@ -6,6 +6,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 const HowItWorks = () => {
   const { theme, user } = useAuth();
@@ -126,10 +127,13 @@ const HowItWorks = () => {
         </div>
 
         <div className="mt-16 text-center">
-          <button className="inline-flex items-center px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-300 transform hover:scale-105">
+          <Link
+            to={user ? "/doctors" : "/login"}
+            className="inline-flex items-center px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-colors duration-300 transform hover:scale-105"
+          >
             {user ? "Book a Consultation" : "Get Started Now With SignUp "}
             <ArrowRight className="ml-2 w-5 h-5" />
-          </button>
+          </Link>
         </div>
       </div>
     </section>

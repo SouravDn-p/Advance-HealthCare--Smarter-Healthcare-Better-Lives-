@@ -15,6 +15,7 @@ import {
   Thermometer,
   FlaskConical,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const specialties = [
   {
@@ -151,7 +152,8 @@ const SpecialtySelection = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {specialties.map((specialty, index) => (
-            <div
+            <Link
+              to={`/doctors/${specialty.title}`}
               key={index}
               className="group relative bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 cursor-pointer"
             >
@@ -159,7 +161,10 @@ const SpecialtySelection = () => {
                 className={`absolute inset-0 bg-${specialty.color}-500 opacity-0 group-hover:opacity-5 rounded-xl transition-opacity duration-300`}
               />
 
-              <div className="flex items-start space-x-4">
+              <div
+                to={`/doctor/${specialty.title}`}
+                className="flex items-start space-x-4"
+              >
                 <div
                   className={`flex-shrink-0 p-3 rounded-lg bg-${specialty.color}-100 dark:bg-${specialty.color}-900/20 text-${specialty.color}-500 dark:text-${specialty.color}-400 group-hover:scale-110 transition-transform duration-300`}
                 >
@@ -191,7 +196,7 @@ const SpecialtySelection = () => {
                   />
                 </svg>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

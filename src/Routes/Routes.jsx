@@ -1,4 +1,8 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  useParams,
+} from "react-router-dom";
 import Home from "../components/Home/Home";
 import Login from "../components/authPages/Login";
 import Main from "../layout/Main";
@@ -12,6 +16,12 @@ import MedicalRecord from "../components/medicalRecords/MedicalRecord";
 import Telemedicine from "../components/telemedicine/Telemedicine";
 import AIDiagnosis from "../components/aiDiagnosis/AiDiagnosis";
 import EmergencyServices from "../components/emargency/EmergencyServices";
+import DoctorsCategory from "../components/doctors/DoctorsCategory";
+
+const DoctorsCategoryWrapper = () => {
+  const { speciality } = useParams();
+  return <DoctorsCategory speciality={speciality} />;
+};
 
 export const router = createBrowserRouter([
   {
@@ -51,10 +61,8 @@ export const router = createBrowserRouter([
         element: <EmergencyServices />,
       },
       {
-        path: "/doctors/:specialty",
-        element: <Doctor />,
-        loader: ({ params }) =>
-          fetch(`http://localhost:3000/doctors/${params.specialty}`),
+        path: "/doctors/:speciality",
+        element: <DoctorsCategoryWrapper />,
       },
       {
         path: "dashboard/appointments",

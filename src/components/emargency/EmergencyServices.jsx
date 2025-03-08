@@ -342,7 +342,6 @@ const EmergencyServices = () => {
           </div>
         </div>
 
-        {/* Emergency Contact Banner */}
         <div className="mb-8 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-start gap-3">
           <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-500 flex-shrink-0 mt-0.5" />
           <div>
@@ -366,7 +365,6 @@ const EmergencyServices = () => {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="flex space-x-1 p-1 rounded-lg bg-gray-100 dark:bg-gray-800 mb-6">
           <button
             onClick={() => setActiveTab("hospitals")}
@@ -394,7 +392,6 @@ const EmergencyServices = () => {
 
         {activeTab === "hospitals" && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Hospital List */}
             <div
               className={`lg:col-span-${
                 selectedHospital ? "1" : "3"
@@ -548,7 +545,6 @@ const EmergencyServices = () => {
               </div>
             </div>
 
-            {/* Hospital Details & Map */}
             {selectedHospital && (
               <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col h-[600px]">
                 <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
@@ -567,14 +563,12 @@ const EmergencyServices = () => {
                 </div>
 
                 <div className="flex-1 overflow-y-auto">
-                  {/* Map */}
                   <div
                     className={`relative ${
                       isMapExpanded ? "h-96" : "h-48"
                     } bg-gray-200 dark:bg-gray-700 transition-all duration-300`}
                   >
                     <div className="absolute inset-0 flex items-center justify-center">
-                      {/* This would be replaced with an actual Google Map in a real application */}
                       <div
                         ref={mapRef}
                         className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
@@ -606,7 +600,6 @@ const EmergencyServices = () => {
                     </button>
                   </div>
 
-                  {/* Hospital Info */}
                   <div className="p-4">
                     <div className="flex justify-between items-start">
                       <div>
@@ -921,7 +914,6 @@ const EmergencyServices = () => {
           </div>
         )}
 
-        {/* Ambulance Booking Modal */}
         {isBookingAmbulance && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
@@ -999,7 +991,6 @@ const EmergencyServices = () => {
                   </div>
                 ) : (
                   <>
-                    {/* Booking Steps */}
                     <div className="mb-6">
                       <div className="flex items-center">
                         <div
@@ -1142,7 +1133,6 @@ const EmergencyServices = () => {
 
                         <div className="mb-4">
                           <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4 relative">
-                            {/* This would be replaced with an actual Google Map in a real application */}
                             <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
                               <img
                                 src="/placeholder.svg?height=200&width=600"
@@ -1312,7 +1302,6 @@ const EmergencyServices = () => {
           </div>
         )}
 
-        {/* Emergency Resources */}
         <div className="mt-8">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Emergency Resources
@@ -1382,7 +1371,6 @@ const EmergencyServices = () => {
           </div>
         </div>
 
-        {/* Help Section */}
         <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0 mt-0.5" />
