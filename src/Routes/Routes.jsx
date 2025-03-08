@@ -17,6 +17,7 @@ import Telemedicine from "../components/telemedicine/Telemedicine";
 import AIDiagnosis from "../components/aiDiagnosis/AiDiagnosis";
 import EmergencyServices from "../components/emargency/EmergencyServices";
 import DoctorsCategory from "../components/doctors/DoctorsCategory";
+import PrivateRoute from "./PrivateRoute";
 
 const DoctorsCategoryWrapper = () => {
   const { speciality } = useParams();
@@ -66,7 +67,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "dashboard/appointments",
-        element: <Appointments />,
+        element: (
+          <PrivateRoute>
+            <Appointments />
+          </PrivateRoute>
+        ),
       },
       {
         path: "dashboard/medical-records",

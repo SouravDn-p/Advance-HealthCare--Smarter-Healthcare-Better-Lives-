@@ -48,14 +48,6 @@ const MeetOurExperts = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // axiosPublic
-    //   .get(`/doctor/${selectedDoctor._id}`)
-    //   .then((res) => console.log(res.data));
-    // console.log("appointmentID", selectedDoctor._id);
-    // console.log("selectedDoctor.name", selectedDoctor.name);
-    // console.log("appointmentDate", appointmentDate);
-    // console.log("appointmentTime", appointmentTime);
-    // console.log("appointmentType", appointmentType);
 
     const newAppointment = {
       patientName: user?.displayName,
