@@ -11,7 +11,6 @@ import {
   FiChevronDown,
   FiUser,
   FiActivity,
-  FiBriefcase,
   FiHeart,
   FiMessageSquare,
 } from "react-icons/fi";
@@ -90,13 +89,13 @@ const Navbar = () => {
                 <FiHome className="w-4 h-4" />
                 <span>Home</span>
               </NavItem>
-              <NavItem to="/services">
-                <FiBriefcase className="w-4 h-4" />
-                Services
-              </NavItem>
               <NavItem to="/doctors">
                 <FiHeart className="w-4 h-4" />
                 Doctors
+              </NavItem>
+              <NavItem to="/AiDiagnosis" onClick={() => setIsMenuOpen(false)}>
+                <FiHeart className="w-4 h-4" />
+                AiDiagnosis
               </NavItem>
               {user && (
                 <>
@@ -208,13 +207,13 @@ const Navbar = () => {
                   <FiHome className="w-4 h-4" />
                   <span>Home</span>
                 </NavItem>
-                <NavItem to="/services" onClick={() => setIsMenuOpen(false)}>
-                  <FiBriefcase className="w-4 h-4" />
-                  Services
-                </NavItem>
                 <NavItem to="/doctors" onClick={() => setIsMenuOpen(false)}>
                   <FiHeart className="w-4 h-4" />
                   Doctors
+                </NavItem>
+                <NavItem to="/AiDiagnosis" onClick={() => setIsMenuOpen(false)}>
+                  <FiHeart className="w-4 h-4" />
+                  AiDiagnosis
                 </NavItem>
                 {user && (
                   <>

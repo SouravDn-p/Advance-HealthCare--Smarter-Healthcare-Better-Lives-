@@ -135,7 +135,6 @@ const Footer = () => {
                 />
               </div>
             </div>
-
             <nav>
               <div className="flex gap-6">
                 <a

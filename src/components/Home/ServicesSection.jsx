@@ -1,4 +1,17 @@
-import { Video, Pill, TestTube, Umbrella, Settings } from "lucide-react";
+import {
+  Video,
+  Pill,
+  TestTube,
+  Umbrella,
+  Settings,
+  Clock,
+  Users,
+  CheckCircle,
+  Star,
+  Download,
+  Headset,
+  Hospital,
+} from "lucide-react";
 import { useContext } from "react";
 import Lottie from "lottie-react";
 import { AuthContexts } from "../../providers/AuthProvider";
@@ -41,6 +54,43 @@ const ServicesSection = () => {
       description:
         "Our expert engineers can help build your health-tech solutions",
       color: "orange",
+    },
+  ];
+  const stats = [
+    {
+      icon: <Clock className="w-12 h-12 text-blue-500" />,
+      value: "10 Minutes",
+      description: "Average consultation waiting time",
+    },
+    {
+      icon: <Users className="w-12 h-12 text-pink-500" />,
+      value: "4M+",
+      description: "People under healthcare coverage",
+    },
+    {
+      icon: <CheckCircle className="w-12 h-12 text-green-500" />,
+      value: "561K+",
+      description: "Video consultation successfully completed",
+    },
+    {
+      icon: <Star className="w-12 h-12 text-yellow-500" />,
+      value: "95%",
+      description: "Customers gave 5-star rating",
+    },
+    {
+      icon: <Download className="w-12 h-12 text-blue-500" />,
+      value: "1+ Million",
+      description: "App downloads on Playstore",
+    },
+    {
+      icon: <Headset className="w-12 h-12 text-purple-500" />,
+      value: "24/7",
+      description: "Doctors available round the clock",
+    },
+    {
+      icon: <Hospital className="w-12 h-12 text-orange-500" />,
+      value: "500+",
+      description: "Partnered with reputed hospitals",
     },
   ];
 
@@ -142,6 +192,63 @@ const ServicesSection = () => {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+      <div
+        className={`mt-16 bg-opacity-30 py-12 px-6 md:px-12 rounded-xl text-center ${
+          theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+        }`}
+      >
+        <div className="text-center mb-14">
+          <h2
+            className={`text-4xl md:text-5xl font-bold tracking-tight ${
+              theme === "dark" ? "text-white" : "text-gray-900"
+            }`}
+          >
+            Our Impact in Numbers
+          </h2>
+          <p
+            className={`mt-4 text-lg md:text-xl ${
+              theme === "dark" ? "text-gray-300" : "text-gray-600"
+            }`}
+          >
+            We're proud of the difference we've made in healthcare delivery and
+            patient outcomes
+          </p>
+        </div>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-8">
+          {stats.map((stat, index) => (
+            <div key={index} className="flex flex-col items-center">
+              {stat.icon}
+              <h3
+                className={`mt-4 text-2xl font-bold ${
+                  theme === "dark" ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {stat.value}
+              </h3>
+              <p
+                className={`${
+                  theme === "dark" ? "text-gray-400" : "text-gray-600"
+                } text-sm`}
+              >
+                {stat.description}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-12 text-center">
+          <p
+            className={` max-w-2xl mx-auto ${
+              theme === "dark" ? "text-gray-400" : "text-gray-600"
+            }`}
+          >
+            Our commitment to excellence has helped us achieve these milestones,
+            and we continue to strive for better healthcare outcomes every day.
+          </p>
+          <button className="mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors duration-300">
+            Learn More About Our Impact
+          </button>
         </div>
       </div>
     </section>

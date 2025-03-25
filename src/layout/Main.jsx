@@ -4,6 +4,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import Footer from "../components/shared/Footer";
 import Header from "../components/shared/Header";
 import { AuthContexts } from "../providers/AuthProvider";
+import BotBox from "../bot/BotBox";
 
 export default function Main() {
   const { theme } = useContext(AuthContexts);
@@ -25,8 +26,10 @@ export default function Main() {
       }}
     >
       <Header />
+
       {isLogin || <Navbar />}
       <Outlet />
+     
       {isLogin || <Footer />}
     </div>
   );

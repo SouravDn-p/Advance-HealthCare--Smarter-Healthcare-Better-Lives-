@@ -18,6 +18,9 @@ import AIDiagnosis from "../components/aiDiagnosis/AiDiagnosis";
 import EmergencyServices from "../components/emargency/EmergencyServices";
 import DoctorsCategory from "../components/doctors/DoctorsCategory";
 import PrivateRoute from "./PrivateRoute";
+import BotBox from "../bot/BotBox";
+import Dashboard from "../extra/Dashboard";
+import DashboardLayout from "../layout/DashboardLayout";
 
 const DoctorsCategoryWrapper = () => {
   const { speciality } = useParams();
@@ -62,11 +65,23 @@ export const router = createBrowserRouter([
         element: <EmergencyServices />,
       },
       {
-        path: "/doctors/:speciality",
-        element: <DoctorsCategoryWrapper />,
+        path: "/bot",
+        element: <BotBox />,
       },
       {
-        path: "dashboard/appointments",
+        path: "/dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "/doctors/:speciality",
+        element: (
+          <PrivateRoute>
+            <DoctorsCategoryWrapper />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/dashboard/appointments",
         element: (
           <PrivateRoute>
             <Appointments />
@@ -74,16 +89,71 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "dashboard/medical-records",
-        element: <MedicalRecord />,
+        path: "/dashboard/medical-records",
+        element: (
+          <PrivateRoute>
+            <MedicalRecord />
+          </PrivateRoute>
+        ),
       },
       {
-        path: "dashboard/consultation",
-        element: <Telemedicine />,
+        path: "/dashboard/consultation",
+        element: (
+          <PrivateRoute>
+            <Telemedicine />
+          </PrivateRoute>
+        ),
       },
       {
-        path: "dashboard/AIDiagnosis",
-        element: <AIDiagnosis />,
+        path: "AIDiagnosis",
+        element: (
+          <PrivateRoute>
+            <AIDiagnosis />
+          </PrivateRoute>
+        ),
+      },
+    ],
+  },
+  {
+    path: "/dashboard-layout",
+    element: <DashboardLayout />,
+    children: [
+      {
+        index: true,
+        path: "dashboard",
+        element: <Dashboard />,
+      },
+      {
+        path: "appointments",
+        element: (
+          <PrivateRoute>
+            <Appointments />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "medical-records",
+        element: (
+          <PrivateRoute>
+            <MedicalRecord />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "consultation",
+        element: (
+          <PrivateRoute>
+            <Telemedicine />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "diagnosis",
+        element: (
+          <PrivateRoute>
+            <AIDiagnosis />
+          </PrivateRoute>
+        ),
       },
     ],
   },
