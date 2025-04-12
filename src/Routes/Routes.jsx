@@ -18,7 +18,6 @@ import AIDiagnosis from "../components/aiDiagnosis/AiDiagnosis";
 import EmergencyServices from "../components/emargency/EmergencyServices";
 import DoctorsCategory from "../components/doctors/DoctorsCategory";
 import PrivateRoute from "./PrivateRoute";
-import BotBox from "../bot/BotBox";
 import Dashboard from "../extra/Dashboard";
 import DashboardLayout from "../layout/DashboardLayout";
 
@@ -63,10 +62,6 @@ export const router = createBrowserRouter([
       {
         path: "/emergency",
         element: <EmergencyServices />,
-      },
-      {
-        path: "/bot",
-        element: <BotBox />,
       },
       {
         path: "/dashboard",

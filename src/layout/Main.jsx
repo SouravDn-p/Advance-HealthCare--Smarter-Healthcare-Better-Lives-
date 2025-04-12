@@ -4,14 +4,15 @@ import { Outlet, useLocation } from "react-router-dom";
 import Footer from "../components/shared/Footer";
 import Header from "../components/shared/Header";
 import { AuthContexts } from "../providers/AuthProvider";
-import BotBox from "../bot/BotBox";
+import SdBot from "../extra/sdChatBot/SdBot";
 
 export default function Main() {
   const { theme } = useContext(AuthContexts);
   const location = useLocation();
   const isLogin =
     location.pathname.includes("login") ||
-    location.pathname.includes("register");
+    location.pathname.includes("register") ||
+    location.pathname.includes("forgotPassword");
   return (
     <div
       className={`rounded-xl shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-800
@@ -21,16 +22,15 @@ export default function Main() {
               : "bg-gray-900/90 text-gray-100"
           }`}
       style={{
-        backdropFilter: "blur(12px)",
+        // backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
       }}
     >
       <Header />
-
       {isLogin || <Navbar />}
       <Outlet />
-     
       {isLogin || <Footer />}
+      {isLogin || <SdBot />}
     </div>
   );
 }

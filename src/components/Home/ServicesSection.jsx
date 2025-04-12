@@ -15,7 +15,7 @@ import {
 import { useContext } from "react";
 import Lottie from "lottie-react";
 import { AuthContexts } from "../../providers/AuthProvider";
-import service from "../../../public/service.json";
+import service from "../../assets/jsons/service.json";
 const ServicesSection = () => {
   const { theme, user } = useContext(AuthContexts);
 
