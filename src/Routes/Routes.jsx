@@ -20,6 +20,12 @@ import DoctorsCategory from "../components/doctors/DoctorsCategory";
 import PrivateRoute from "./PrivateRoute";
 import Dashboard from "../extra/Dashboard";
 import DashboardLayout from "../layout/DashboardLayout";
+import { BloodDonors } from "../components/bloodDonations/BloodDonors";
+import DoctorManagement from "../components/dashboard/admin/DoctorManagement";
+import Announcements from "../components/dashboard/admin/announcement/Announcements";
+import FeedbackComplaints from "../components/dashboard/shared/feedback/FeedbackComplaints";
+import Settings from "../components/dashboard/shared/setting/Settings";
+import HelpSupportPage from "../components/dashboard/shared/helpAndSupport/HelpSupportPage";
 
 const DoctorsCategoryWrapper = () => {
   const { speciality } = useParams();
@@ -63,10 +69,7 @@ export const router = createBrowserRouter([
         path: "/emergency",
         element: <EmergencyServices />,
       },
-      {
-        path: "/dashboard",
-        element: <Dashboard />,
-      },
+
       {
         path: "/doctors/:speciality",
         element: (
@@ -75,42 +78,10 @@ export const router = createBrowserRouter([
           </PrivateRoute>
         ),
       },
-      {
-        path: "/dashboard/appointments",
-        element: (
-          <PrivateRoute>
-            <Appointments />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "/dashboard/medical-records",
-        element: (
-          <PrivateRoute>
-            <MedicalRecord />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "/dashboard/consultation",
-        element: (
-          <PrivateRoute>
-            <Telemedicine />
-          </PrivateRoute>
-        ),
-      },
-      {
-        path: "AIDiagnosis",
-        element: (
-          <PrivateRoute>
-            <AIDiagnosis />
-          </PrivateRoute>
-        ),
-      },
     ],
   },
   {
-    path: "/dashboard-layout",
+    path: "/dashboard",
     element: <DashboardLayout />,
     children: [
       {
@@ -143,10 +114,58 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "diagnosis",
+        path: "AiDiagnosis",
         element: (
           <PrivateRoute>
             <AIDiagnosis />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "manageDoctors",
+        element: (
+          <PrivateRoute>
+            <DoctorManagement />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "announcements",
+        element: (
+          <PrivateRoute>
+            <Announcements />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "feedback",
+        element: (
+          <PrivateRoute>
+            <FeedbackComplaints />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "bloodDonors",
+        element: (
+          <PrivateRoute>
+            <BloodDonors />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "settings",
+        element: (
+          <PrivateRoute>
+            <Settings />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "help",
+        element: (
+          <PrivateRoute>
+            <HelpSupportPage />
           </PrivateRoute>
         ),
       },

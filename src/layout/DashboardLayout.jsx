@@ -1,6 +1,6 @@
 "use client";
 
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   Calendar,
@@ -24,12 +24,18 @@ import {
   Moon,
   CreditCard,
   HelpCircle,
+  Users,
+  CalendarCheck,
+  Droplet,
+  BarChart2,
+  MessageCircle,
+  Megaphone,
 } from "lucide-react";
 import useAuth from "../hooks/useAuth";
 import { Outlet } from "react-router-dom";
 
-const DashboardLayout = ({ children }) => {
-  const { user, theme, setTheme } = useAuth();
+const DashboardLayout = () => {
+  const { user, theme, setTheme, dbUser } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -68,53 +74,53 @@ const DashboardLayout = ({ children }) => {
     {
       name: "Dashboard",
       icon: <Home className="w-5 h-5" />,
-      section: "dashboard-layout/dashboard",
+      section: "dashboard/dashboard",
     },
     {
       name: "Appointments",
       icon: <Calendar className="w-5 h-5" />,
-      section: "dashboard-layout/appointments",
+      section: "dashboard/appointments",
     },
     {
       name: "Medical Records",
       icon: <FileText className="w-5 h-5" />,
-      section: "dashboard-layout/medical-records",
+      section: "dashboard/medical-records",
     },
     {
       name: "Medications",
       icon: <Pill className="w-5 h-5" />,
-      section: "dashboard-layout/medications",
+      section: "dashboard/medications",
     },
     {
       name: "AI Diagnosis",
       icon: <Brain className="w-5 h-5" />,
-      section: "dashboard-layout/diagnosis",
+      section: "dashboard/AiDiagnosis",
     },
     {
       name: "Emergency Services",
       icon: <Ambulance className="w-5 h-5" />,
-      section: "dashboard-layout/emergency",
+      section: "dashboard/emergency",
     },
     {
       name: "Find Doctors",
       icon: <Stethoscope className="w-5 h-5" />,
-      section: "dashboard-layout/doctors",
+      section: "dashboard/doctors",
     },
     {
       name: "Health Metrics",
       icon: <Activity className="w-5 h-5" />,
-      section: "dashboard-layout/metrics",
+      section: "dashboard/metrics",
     },
     {
       name: "Messages",
       icon: <MessageSquare className="w-5 h-5" />,
-      section: "dashboard-layout/messages",
+      section: "dashboard/messages",
       badge: 2,
     },
     {
       name: "Billing",
       icon: <CreditCard className="w-5 h-5" />,
-      section: "dashboard-layout/billing",
+      section: "dashboard/billing",
     },
   ];
 
@@ -153,6 +159,55 @@ const DashboardLayout = ({ children }) => {
       time: "2 days ago",
       read: true,
       type: "payment",
+    },
+  ];
+
+  const adminNavigationItems = [
+    {
+      name: "Admin Dashboard",
+      icon: <Home className="w-5 h-5" />,
+      section: "dashboard/admin",
+    },
+    {
+      name: "Manage Doctors",
+      icon: <Stethoscope className="w-5 h-5" />,
+      section: "dashboard/manageDoctors",
+    },
+    {
+      name: "Manage Patients",
+      icon: <Users className="w-5 h-5" />,
+      section: "dashboard/managePatients",
+    },
+    {
+      name: "Manage Appointments",
+      icon: <CalendarCheck className="w-5 h-5" />,
+      section: "dashboard/manageAppointments",
+    },
+    {
+      name: "Manage Blood Donors",
+      icon: <Droplet className="w-5 h-5" />,
+      section: "dashboard/bloodDonors",
+    },
+    {
+      name: "Health Reports",
+      icon: <BarChart2 className="w-5 h-5" />,
+      section: "dashboard/healthReports",
+    },
+    {
+      name: "Feedback & Complaints",
+      icon: <MessageCircle className="w-5 h-5" />,
+      section: "dashboard/feedback",
+      badge: 4,
+    },
+    {
+      name: "Announcements",
+      icon: <Megaphone className="w-5 h-5" />,
+      section: "dashboard/announcements",
+    },
+    {
+      name: "Settings",
+      icon: <Settings className="w-5 h-5" />,
+      section: "dashboard/settings",
     },
   ];
 
@@ -232,7 +287,7 @@ const DashboardLayout = ({ children }) => {
       <section className="flex">
         {/* Sidebar */}
         <div
-          className={`fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out ${
+          className={`fixed  inset-y-0 left-0 z-50 w-72 md:w-96 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           } lg:translate-x-0 lg:static lg:inset-auto lg:z-auto`}
         >
@@ -259,13 +314,18 @@ const DashboardLayout = ({ children }) => {
           {/* User Profile */}
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
-                {user?.displayName ? (
-                  user.displayName.charAt(0)
-                ) : (
+              {user?.displayName ? (
+                <img
+                  src={user?.photoURL}
+                  alt="Profile"
+                  className="w-9 h-9 rounded-full border-2 border-pink-400 transition-all duration-300 hover:border-yellow-400"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
                   <User className="w-5 h-5" />
-                )}
-              </div>
+                </div>
+              )}
+
               <div className="ml-3">
                 <p className="font-medium text-gray-900 dark:text-white">
                   {user?.displayName || "Guest User"}
@@ -280,7 +340,10 @@ const DashboardLayout = ({ children }) => {
           {/* Navigation */}
           <div className="p-4 overflow-y-auto h-[calc(100vh-180px)]">
             <nav className="space-y-1">
-              {navigationItems.map((item) => (
+              {(dbUser?.role === "admin"
+                ? adminNavigationItems
+                : navigationItems
+              ).map((item) => (
                 <NavLink
                   key={item.section}
                   to={`/${item.section}`}
@@ -327,10 +390,13 @@ const DashboardLayout = ({ children }) => {
                   </>
                 )}
               </button>
-              <button className="w-full flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 mt-2">
+              <Link
+                to={`/dashboard/help`}
+                className="w-full flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 mt-2"
+              >
                 <HelpCircle className="w-5 h-5 mr-3" />
                 <span>Help & Support</span>
-              </button>
+              </Link>
               <button className="w-full flex items-center px-3 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 mt-2">
                 <LogOut className="w-5 h-5 mr-3" />
                 <span>Sign Out</span>
@@ -340,7 +406,7 @@ const DashboardLayout = ({ children }) => {
         </div>
 
         {/* Main Content */}
-        <div className=" flex flex-col min-h-screen w-full mx-12">
+        <div className=" flex flex-col overflow-y-auto h-screen w-full ">
           {/* Desktop Header */}
           <div className="hidden  lg:flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <div className="flex-1">
@@ -433,13 +499,18 @@ const DashboardLayout = ({ children }) => {
                   }
                   className="flex items-center gap-2 p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                 >
-                  <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
-                    {user?.displayName ? (
-                      user.displayName.charAt(0)
-                    ) : (
-                      <User className="w-4 h-4" />
-                    )}
-                  </div>
+                  {user?.displayName ? (
+                    <img
+                      src={user?.photoURL}
+                      alt="Profile"
+                      className="w-9 h-9 rounded-full border-2 border-pink-400 transition-all duration-300 hover:border-yellow-400"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
+                      <User className="w-5 h-5" />
+                    </div>
+                  )}
+
                   <span className="hidden xl:block font-medium text-gray-900 dark:text-white">
                     {user?.displayName || "Guest User"}
                   </span>
@@ -481,10 +552,9 @@ const DashboardLayout = ({ children }) => {
 
           {/* Page Content */}
           <Outlet />
-          <main className="flex-1 p-4 lg:p-6 overflow-auto">{children}</main>
+          {/* <main className="flex-1 p-4 lg:p-6 overflow-auto">{children}</main> */}
 
-          {/* Footer */}
-          <footer className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
+          {/* <footer className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div>
                 © {new Date().getFullYear()} Advance Health Service. All rights
@@ -511,7 +581,7 @@ const DashboardLayout = ({ children }) => {
                 </a>
               </div>
             </div>
-          </footer>
+          </footer> */}
         </div>
       </section>
 

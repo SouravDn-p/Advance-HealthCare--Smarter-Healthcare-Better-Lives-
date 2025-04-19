@@ -38,7 +38,7 @@ const Navbar = () => {
       onClick={onClick}
       className={({ isActive }) =>
         `relative px-4 py-2 rounded-lg transition-all duration-200
-        hover:bg-gray-100 dark:hover:bg-gray-800
+        hover:bg-gray-100 hover:text-white dark:hover:bg-gray-800
         flex items-center gap-2
         ${isActive ? "text-blue-600 dark:text-blue-400 font-medium" : ""}
         after:content-[''] after:absolute after:bottom-0 after:left-0
@@ -54,11 +54,11 @@ const Navbar = () => {
   return (
     <div className="sticky top-4 z-50 mx-2 md:mx-8 ">
       <div
-        className={`rounded-xl shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-800
+        className={`rounded-xl shadow-lg transition-all duration-300 border
           ${
             theme === "light"
-              ? "bg-white/90 text-gray-900"
-              : "bg-gray-900/90 text-gray-100"
+              ? "bg-white/90 text-gray-900 border-gray-200 "
+              : "bg-gray-900/90 text-gray-100 border-gray-800"
           }`}
         style={{
           backdropFilter: "blur(12px)",
@@ -93,7 +93,10 @@ const Navbar = () => {
                 <FiHeart className="w-4 h-4" />
                 Doctors
               </NavItem>
-              <NavItem to="/AiDiagnosis" onClick={() => setIsMenuOpen(false)}>
+              <NavItem
+                to="/dashboard/AiDiagnosis"
+                onClick={() => setIsMenuOpen(false)}
+              >
                 <FiHeart className="w-4 h-4" />
                 AiDiagnosis
               </NavItem>
@@ -118,7 +121,11 @@ const Navbar = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={toggleTheme}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className={`p-2 rounded-lg ${
+                  theme === "light"
+                    ? "hover:bg-gray-100 "
+                    : "hover:bg-gray-800  "
+                }   transition-colors`}
               >
                 {theme === "light" ? (
                   <FiMoon className="w-5 h-5" />
@@ -131,7 +138,7 @@ const Navbar = () => {
                 <div className="hidden md:flex items-center gap-2 ">
                   <button
                     onClick={() => navigate("/login")}
-                    className="px-4 py-2 rounded-lg bg-green-900 text-white hover:bg-gray-100 dark:hover:bg-indigo-900 transition-colors"
+                    className="px-4 py-2 rounded-lg bg-green-900 text-white hover:bg-gray-100 hover:text-white dark:hover:bg-indigo-900 transition-colors"
                   >
                     Login
                   </button>
@@ -146,7 +153,7 @@ const Navbar = () => {
                 <div className="relative">
                   <button
                     onClick={() => setShowDropdown(!showDropdown)}
-                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 hover:text-white dark:hover:bg-gray-800 transition-colors"
                   >
                     <div className="relative">
                       {user.photoURL ? (
@@ -171,13 +178,13 @@ const Navbar = () => {
                         <p className="font-medium">
                           {user.displayName || "User"}
                         </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+                        <p className="text-sm text-gray-500  dark:text-gray-400 truncate">
                           {user.email}
                         </p>
                       </div>
                       <button
                         onClick={handleSignOut}
-                        className="w-full px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2"
+                        className="w-full px-4 py-2 text-left text-red-600 dark:text-red-400 hover:bg-gray-100 hover:text-white dark:hover:bg-gray-700 flex items-center gap-2"
                       >
                         <FiLogOut className="w-4 h-4" />
                         Logout
@@ -188,7 +195,7 @@ const Navbar = () => {
               )}
 
               <button
-                className="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="md:hidden p-2 rounded-lg hover:bg-gray-100 hover:text-white dark:hover:bg-gray-800 transition-colors"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
               >
                 {isMenuOpen ? (
@@ -238,7 +245,7 @@ const Navbar = () => {
                         navigate("/login");
                         setIsMenuOpen(false);
                       }}
-                      className="w-full px-4 py-2 text-left rounded-full hover:bg-gray-100 dark:hover:bg-cyan-600 transition-colors"
+                      className="w-full px-4 py-2 text-left rounded-full hover:bg-gray-100 hover:text-white dark:hover:bg-cyan-600 transition-colors"
                     >
                       Login
                     </button>

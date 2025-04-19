@@ -11,7 +11,11 @@ const useAuth = () => {
     response,
     setResponse,
     doctors,
-    setDoctors
+    setDoctors,
+    dbUser,
+    setDbUser,
+    errorMessage,
+    setErrorMessage,
   } = useContext(AuthContexts);
   return {
     user,
@@ -23,7 +27,11 @@ const useAuth = () => {
     response,
     setResponse,
     doctors,
-    setDoctors
+    setDoctors,
+    dbUser,
+    setDbUser,
+    errorMessage,
+    setErrorMessage,
   };
 };
 

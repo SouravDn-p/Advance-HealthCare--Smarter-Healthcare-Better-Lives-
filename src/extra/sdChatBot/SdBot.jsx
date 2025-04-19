@@ -104,7 +104,7 @@ const SdBot = () => {
         onClick={() => setShowChatbot((prev) => !prev)}
         className={`btn btn-circle ${
           showChatbot
-            ? "btn-error bg-yellow-400 absolute top-2 right-2 z-10"
+            ? "btn-error bg-red-400 absolute top-2 right-2 z-10"
             : "btn-primary shadow-lg"
         } transition-all duration-300`}
         aria-label={showChatbot ? "Close chatbot" : "Open chatbot"}
