@@ -12,6 +12,8 @@ import {
   Clock,
 } from "lucide-react";
 import { DonateBloodModal } from "./DonateBloodModal";
+import useAxiosPublic from "../../hooks/useAxiosPublic";
+import Swal from "sweetalert2";
 
 // Sample data - in a real app, this would come from an API
 const sampleDonors = [
@@ -84,6 +86,7 @@ const sampleDonors = [
 ];
 
 export function BloodDonors() {
+  const axiosPublic = useAxiosPublic();
   const [donors, setDonors] = useState(sampleDonors);
   const [searchTerm, setSearchTerm] = useState("");
   const [bloodTypeFilter, setBloodTypeFilter] = useState("");
@@ -132,7 +135,7 @@ export function BloodDonors() {
   }, [searchTerm, bloodTypeFilter, activeTab]);
 
   // Handle adding a new donor
-  const handleAddDonor = (newDonor) => {
+  const handleAddDonor = async (newDonor) => {
     // In a real app, you would send this to an API
     const donor = {
       id: sampleDonors.length + 1,
@@ -143,6 +146,26 @@ export function BloodDonors() {
     };
 
     setDonors((prevDonors) => [donor, ...prevDonors]);
+
+    const response = await axiosPublic.post("/addDonor", {
+      donor,
+    });
+    if (response.status === 201) {
+      Swal.fire({
+        icon: "success",
+        title: "Successfully Added Blood Donor",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Failed to Add Blood Donor",
+        text: "Something went wrong. Please try again!",
+        confirmButtonText: "Okay",
+      });
+    }
+
     setIsModalOpen(false);
   };
 

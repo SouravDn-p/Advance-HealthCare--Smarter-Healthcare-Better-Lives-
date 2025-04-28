@@ -21,64 +21,65 @@ import {
 } from "lucide-react";
 import useAuth from "../../../hooks/useAuth";
 import useAxiosPublic from "../../../hooks/useAxiosPublic";
+import Swal from "sweetalert2";
 
 const DoctorManagement = () => {
   var { doctors, setDoctors } = useAuth();
   const axiosPublic = useAxiosPublic();
   // State for doctors list
-  var [doctors, setDoctors] = useState([
-    {
-      id: 1,
-      name: "Dr. Sarah Johnson",
-      specialty: "Cardiology",
-      experience: "15 years experience",
-      image:
-        "https://images.pexels.com/photos/4167542/pexels-photo-4167542.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      rating: 4.9,
-      patients: "2,000+",
-      availability: "Mon - Fri",
-      achievements: [
-        "Best Cardiology Award 2023",
-        "Published 24 Research Papers",
-      ],
-      hospital: "Heart Care Hospital",
-      consultation_fee: "150",
-    },
-    {
-      id: 2,
-      name: "Dr. Michael Chen",
-      specialty: "Neurology",
-      experience: "12 years experience",
-      image:
-        "https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      rating: 4.8,
-      patients: "1,800+",
-      availability: "Tue - Sat",
-      achievements: [
-        "Neurological Research Excellence Award",
-        "Published 18 Research Papers",
-      ],
-      hospital: "City Neurology Center",
-      consultation_fee: "180",
-    },
-    {
-      id: 3,
-      name: "Dr. Emily Rodriguez",
-      specialty: "Pediatrics",
-      experience: "10 years experience",
-      image:
-        "https://images.pexels.com/photos/5214958/pexels-photo-5214958.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      rating: 4.9,
-      patients: "3,000+",
-      availability: "Mon - Thu",
-      achievements: [
-        "Children's Health Foundation Award",
-        "Pediatric Care Excellence",
-      ],
-      hospital: "Children's Medical Center",
-      consultation_fee: "120",
-    },
-  ]);
+  // var [doctors, setDoctors] = useState([
+  //   {
+  //     id: 1,
+  //     name: "Dr. Sarah Johnson",
+  //     specialty: "Cardiology",
+  //     experience: "15 years experience",
+  //     image:
+  //       "https://images.pexels.com/photos/4167542/pexels-photo-4167542.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+  //     rating: 4.9,
+  //     patients: "2,000+",
+  //     availability: "Mon - Fri",
+  //     achievements: [
+  //       "Best Cardiology Award 2023",
+  //       "Published 24 Research Papers",
+  //     ],
+  //     hospital: "Heart Care Hospital",
+  //     consultation_fee: "150",
+  //   },
+  //   {
+  //     id: 2,
+  //     name: "Dr. Michael Chen",
+  //     specialty: "Neurology",
+  //     experience: "12 years experience",
+  //     image:
+  //       "https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+  //     rating: 4.8,
+  //     patients: "1,800+",
+  //     availability: "Tue - Sat",
+  //     achievements: [
+  //       "Neurological Research Excellence Award",
+  //       "Published 18 Research Papers",
+  //     ],
+  //     hospital: "City Neurology Center",
+  //     consultation_fee: "180",
+  //   },
+  //   {
+  //     id: 3,
+  //     name: "Dr. Emily Rodriguez",
+  //     specialty: "Pediatrics",
+  //     experience: "10 years experience",
+  //     image:
+  //       "https://images.pexels.com/photos/5214958/pexels-photo-5214958.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
+  //     rating: 4.9,
+  //     patients: "3,000+",
+  //     availability: "Mon - Thu",
+  //     achievements: [
+  //       "Children's Health Foundation Award",
+  //       "Pediatric Care Excellence",
+  //     ],
+  //     hospital: "Children's Medical Center",
+  //     consultation_fee: "120",
+  //   },
+  // ]);
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -141,7 +142,7 @@ const DoctorManagement = () => {
   // Pagination settings
   const itemsPerPage = 6;
   const totalPages = Math.ceil(
-    doctors.filter(
+    doctors?.filter(
       (doctor) =>
         doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
         (filterSpecialty === "" || doctor.specialty === filterSpecialty)
@@ -210,13 +211,13 @@ const DoctorManagement = () => {
       errors.consultation_fee = "Consultation fee is required";
 
     // Validate image URL
-    if (!formData.image.trim()) {
-      errors.image = "Image URL is required";
-    } else if (
-      !/^https?:\/\/.+\.(jpg|jpeg|png|webp)(\?.*)?$/i.test(formData.image)
-    ) {
-      errors.image = "Please enter a valid image URL";
-    }
+    // if (!formData.image.trim()) {
+    //   errors.image = "Image URL is required";
+    // } else if (
+    //   !/^https?:\/\/.+\.(jpg|jpeg|png|webp)(\?.*)?$/i.test(formData.image)
+    // ) {
+    //   errors.image = "Please enter a valid image URL";
+    // }
 
     // Validate numeric fields
     if (
@@ -235,7 +236,7 @@ const DoctorManagement = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validate form
@@ -263,6 +264,25 @@ const DoctorManagement = () => {
         ),
       };
       setDoctors([...doctors, newDoctor]);
+
+      const response = await axiosPublic.post("/addDoctor", {
+        doctor: newDoctor,
+      });
+      if (response.status === 201) {
+        Swal.fire({
+          icon: "success",
+          title: "Successfully Added Doctor",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Add Doctor",
+          text: "Something went wrong. Please try again!",
+          confirmButtonText: "Okay",
+        });
+      }
     }
 
     // Reset form and hide it
@@ -287,7 +307,7 @@ const DoctorManagement = () => {
 
   const confirmDelete = () => {
     if (doctorToDelete) {
-      const updatedDoctors = doctors.filter(
+      const updatedDoctors = doctors?.filter(
         (doctor) => doctor.id !== doctorToDelete.id
       );
       setDoctors(updatedDoctors);
@@ -297,14 +317,14 @@ const DoctorManagement = () => {
   };
 
   // Filter doctors based on search and specialty filter
-  const filteredDoctors = doctors.filter(
+  const filteredDoctors = doctors?.filter(
     (doctor) =>
       doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
       (filterSpecialty === "" || doctor.specialty === filterSpecialty)
   );
 
   // Get current page items
-  const currentDoctors = filteredDoctors.slice(
+  const currentDoctors = filteredDoctors?.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -780,7 +800,7 @@ const DoctorManagement = () => {
       </div>
 
       {/* Doctors List */}
-      {currentDoctors.length === 0 ? (
+      {currentDoctors?.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
           <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
             <Users className="w-8 h-8 text-gray-500 dark:text-gray-400" />
@@ -807,9 +827,9 @@ const DoctorManagement = () => {
         </div>
       ) : viewMode === "grid" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {currentDoctors.map((doctor) => (
+          {currentDoctors?.map((doctor) => (
             <div
-              key={doctor.id}
+              key={doctor._id}
               className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
             >
               <div className="relative">
@@ -960,7 +980,7 @@ const DoctorManagement = () => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                {currentDoctors.map((doctor) => (
+                {currentDoctors?.map((doctor) => (
                   <tr
                     key={doctor.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50"

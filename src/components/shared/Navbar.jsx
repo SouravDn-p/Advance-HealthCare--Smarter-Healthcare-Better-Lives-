@@ -102,17 +102,9 @@ const Navbar = () => {
               </NavItem>
               {user && (
                 <>
-                  <NavItem to="/dashboard/appointments">
-                    <FiClipboard className="w-4 h-4" />
-                    Appointments
-                  </NavItem>
-                  <NavItem to="/dashboard/medical-records">
-                    <FiActivity className="w-4 h-4" />
-                    Medical Records
-                  </NavItem>
-                  <NavItem to="/dashboard/consultation">
+                  <NavItem to="/dashboard/dashboard">
                     <FiMessageSquare className="w-4 h-4" />
-                    Telemedicine
+                    Dashboard
                   </NavItem>
                 </>
               )}

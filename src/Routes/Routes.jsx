@@ -69,7 +69,6 @@ export const router = createBrowserRouter([
         path: "/emergency",
         element: <EmergencyServices />,
       },
-
       {
         path: "/doctors/:speciality",
         element: (

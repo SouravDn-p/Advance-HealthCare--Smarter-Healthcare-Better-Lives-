@@ -31,8 +31,15 @@ import {
   MessageCircle,
   Megaphone,
 } from "lucide-react";
+import { FiMessageSquare } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
 import { Outlet } from "react-router-dom";
+import { CgProfile } from "react-icons/cg";
+import { FaHome } from "react-icons/fa";
+import {
+  IoChatbubbleEllipsesOutline,
+  IoSettingsOutline,
+} from "react-icons/io5";
 
 const DashboardLayout = () => {
   const { user, theme, setTheme, dbUser } = useAuth();
@@ -41,6 +48,7 @@ const DashboardLayout = () => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("dashboard");
   const [unreadNotifications, setUnreadNotifications] = useState(3);
+  const isDarkMode = true;
 
   // Toggle sidebar on mobile
   const toggleSidebar = () => {
@@ -85,6 +93,12 @@ const DashboardLayout = () => {
       name: "Medical Records",
       icon: <FileText className="w-5 h-5" />,
       section: "dashboard/medical-records",
+    },
+
+    {
+      name: "Telemedicine",
+      icon: <FiMessageSquare className="w-5 h-5" />,
+      section: "dashboard/consultation",
     },
     {
       name: "Medications",
@@ -397,10 +411,75 @@ const DashboardLayout = () => {
                 <HelpCircle className="w-5 h-5 mr-3" />
                 <span>Help & Support</span>
               </Link>
+
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 py-2.5 px-3 rounded-lg transition-all duration-200 ${
+                    isActive
+                      ? isDarkMode
+                        ? "bg-gray-700/60 text-white font-bold shadow-md"
+                        : "bg-gray-300 text-gray-900 font-bold shadow-md"
+                      : isDarkMode
+                      ? "hover:bg-gray-800/40 text-gray-100"
+                      : "hover:bg-gray-200 text-gray-800"
+                  }`
+                }
+              >
+                <FaHome
+                  size={20}
+                  className={`${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                />
+                <span
+                  className={`${
+                    isDarkMode ? "text-gray-100" : "text-gray-800"
+                  }`}
+                >
+                  Home
+                </span>
+              </NavLink>
+              <NavLink
+                to="/dashboard/settings"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 py-2.5 px-3 rounded-lg transition-all duration-200 ${
+                    isActive
+                      ? isDarkMode
+                        ? "bg-gray-700/60 text-white font-bold shadow-md"
+                        : "bg-gray-300 text-gray-900 font-bold shadow-md"
+                      : isDarkMode
+                      ? "hover:bg-gray-800/40 text-gray-100"
+                      : "hover:bg-gray-200 text-gray-800"
+                  }`
+                }
+              >
+                <IoSettingsOutline
+                  size={20}
+                  className={`${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                />
+                <span
+                  className={`${
+                    isDarkMode ? "text-gray-100" : "text-gray-800"
+                  }`}
+                >
+                  Settings
+                </span>
+              </NavLink>
               <button className="w-full flex items-center px-3 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 mt-2">
                 <LogOut className="w-5 h-5 mr-3" />
                 <span>Sign Out</span>
               </button>
+            </div>
+            {/* Version Info */}
+            <div
+              className={`mt-auto pt-6 text-center text-xs ${
+                isDarkMode ? "text-indigo-300/70" : "text-indigo-600/70"
+              }`}
+            >
+              <p>Advance HealthService v1.2.0</p>
             </div>
           </div>
         </div>
