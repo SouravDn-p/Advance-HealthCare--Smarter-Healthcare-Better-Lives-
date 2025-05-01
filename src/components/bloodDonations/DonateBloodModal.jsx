@@ -37,6 +37,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
     phone: "",
     bloodType: "",
     donationCenter: "",
+    manualDonationCenter: "",
     hasRecentIllness: false,
     hasTattoo: false,
     hasMedication: false,
@@ -156,6 +157,9 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
       if (!formData.phone) newErrors.phone = "Phone number is required";
       if (!formData.bloodType) newErrors.bloodType = "Blood type is required";
     } else if (currentStep === 2) {
+      if (!formData.donationType)
+        newErrors.donationType = "Please select a donation Type";
+    } else if (currentStep === 3) {
       if (!formData.donationCenter)
         newErrors.donationCenter = "Please select a donation center";
       if (!formData.appointmentDate)
@@ -168,6 +172,15 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
 
   const handleNext = () => {
     if (validateStep(step)) {
+      if (step === 2 && !isEligible) {
+        // Prevent moving to step 3 if not eligible
+        setErrors({
+          ...errors,
+          eligibility:
+            "You are not eligible to proceed due to health concerns. Please consult with medical staff.",
+        });
+        return;
+      }
       setStep((prev) => prev + 1);
     }
   };
@@ -179,6 +192,11 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (step < 3) {
+      // Just move to the next step
+      handleNext();
+      return;
+    }
     if (!formData.termsAccepted) {
       setErrors({ termsAccepted: "You must accept the terms and conditions" });
       return;
@@ -187,7 +205,6 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
     setIsSubmitting(true);
 
     try {
-      // In a real app, you would send this to an API
       await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
 
       onSubmit({
@@ -195,10 +212,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
         email: formData.email,
         contact: formData.phone,
         bloodType: formData.bloodType,
-        location:
-          donationCenters.find(
-            (c) => c.id.toString() === formData.donationCenter
-          )?.name || "Unknown",
+        location: formData.manualDonationCenter,
       });
 
       // Reset form
@@ -208,6 +222,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
         phone: "",
         bloodType: "",
         donationCenter: "",
+        manualDonationCenter: "",
         hasRecentIllness: false,
         hasTattoo: false,
         hasMedication: false,
@@ -365,7 +380,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                       <div className="relative">
                         <button
                           type="button"
-                          className="w-full px-3 py-2 text-left border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 flex justify-between items-center dark:bg-gray-700 dark:text-white"
+                          className="w-full px-3 py-2 text-left border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 flex justify-between itemsamna-center dark:bg-gray-700 dark:text-white"
                           onClick={() =>
                             setBloodTypeDropdownOpen(!bloodTypeDropdownOpen)
                           }
@@ -489,7 +504,20 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                     </div>
                   </div>
 
-                  {!isEligible && (
+                  {isEligible ? (
+                    <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md p-4 flex gap-3">
+                      <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="font-medium text-green-800 dark:text-green-300">
+                          Eligible to Donate
+                        </h4>
+                        <p className="text-sm text-green-700 dark:text-green-200">
+                          You are eligible to proceed with scheduling your
+                          donation.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
                     <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md p-4 flex gap-3">
                       <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
                       <div>
@@ -497,13 +525,17 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                           Eligibility Concern
                         </h4>
                         <p className="text-sm text-red-700 dark:text-red-200">
-                          Based on your responses, you may not be eligible to
-                          donate at this time. You can still schedule an
-                          appointment, but please consult with the medical
-                          staff.
+                          Based on your responses, you are not eligible to
+                          donate at this time due to recent illness or
+                          tattoos/piercings. Please consult with medical staff
+                          for further guidance.
                         </p>
                       </div>
                     </div>
+                  )}
+
+                  {errors.eligibility && (
+                    <p className="text-sm text-red-500">{errors.eligibility}</p>
                   )}
 
                   <div className="pt-4">
@@ -618,57 +650,17 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
 
                   <div className="space-y-4">
                     <div className="space-y-2" ref={centerRef}>
-                      <label
-                        htmlFor="donationCenter"
-                        className="block text-sm font-medium"
-                      >
-                        Donation Center
-                      </label>
-                      <div className="relative">
-                        <button
-                          type="button"
-                          className="w-full px-3 py-2 text-left border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 flex justify-between items-center dark:bg-gray-700 dark:text-white"
-                          onClick={() =>
-                            setCenterDropdownOpen(!centerDropdownOpen)
-                          }
-                        >
-                          {donationCenters.find(
-                            (c) => c.id.toString() === formData.donationCenter
-                          )?.name || "Select a donation center"}
-                          <svg
-                            className="h-5 w-5 text-gray-400"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
+                      {/* Add input field to allow manual entry */}
+                      <input
+                        type="text"
+                        placeholder="Or enter a donation center manually"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                        value={formData.manualDonationCenter || ""}
+                        onChange={(e) =>
+                          handleChange("manualDonationCenter", e.target.value)
+                        }
+                      />
 
-                        {centerDropdownOpen && (
-                          <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg rounded-md border border-gray-200 dark:border-gray-700 py-1 max-h-60 overflow-auto">
-                            {donationCenters.map((center) => (
-                              <button
-                                key={center.id}
-                                type="button"
-                                className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                onClick={() => {
-                                  handleChange(
-                                    "donationCenter",
-                                    center.id.toString()
-                                  );
-                                  setCenterDropdownOpen(false);
-                                }}
-                              >
-                                {center.name}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
                       {errors.donationCenter && (
                         <p className="text-sm text-red-500">
                           {errors.donationCenter}
@@ -676,42 +668,43 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                       )}
                     </div>
 
-                    {formData.donationCenter && (
+                    {/* Show address or manual input */}
+                    {(formData.donationCenter ||
+                      formData.manualDonationCenter) && (
                       <div className="flex items-start gap-2 text-sm">
                         <MapPin className="h-4 w-4 text-gray-400 mt-0.5" />
                         <span className="text-gray-600 dark:text-gray-300">
-                          {
+                          {formData.manualDonationCenter ||
                             donationCenters.find(
                               (c) => c.id.toString() === formData.donationCenter
-                            )?.address
-                          }
+                            )?.address}
                         </span>
                       </div>
                     )}
 
                     <div className="space-y-2">
                       <label
-                        htmlFor="appointmentDate"
+                        htmlFor="lastDonationDate"
                         className="block text-sm font-medium"
                       >
-                        Appointment Date
+                        Last Donation Date
                       </label>
                       <div className="relative">
                         <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                         <input
-                          id="appointmentDate"
+                          id="lastDonationDate"
                           type="date"
                           className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
-                          min={new Date().toISOString().split("T")[0]}
-                          value={formData.appointmentDate}
+                          // 👇 NO min attribute anymore, so user can pick past dates
+                          value={formData.lastDonationDate}
                           onChange={(e) =>
-                            handleChange("appointmentDate", e.target.value)
+                            handleChange("lastDonationDate", e.target.value)
                           }
                         />
                       </div>
-                      {errors.appointmentDate && (
+                      {errors.lastDonationDate && (
                         <p className="text-sm text-red-500">
-                          {errors.appointmentDate}
+                          {errors.lastDonationDate}
                         </p>
                       )}
                     </div>
@@ -759,7 +752,12 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  disabled={step === 2 && !isEligible}
+                  className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                    step === 2 && !isEligible
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
                 >
                   Continue
                 </button>

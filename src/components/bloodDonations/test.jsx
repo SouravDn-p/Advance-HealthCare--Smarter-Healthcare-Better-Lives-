@@ -42,7 +42,6 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
     hasMedication: false,
     donationType: "whole",
     appointmentDate: "",
-    isOkayToDonate: false,
     termsAccepted: false,
   });
 
@@ -86,12 +85,12 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
 
     if (isOpen) {
       document.addEventListener("keydown", handleEscapeKey);
-      document.body.style.overflow = "hidden";
+      document.body.style.overflow = "hidden"; // Prevent scrolling when modal is open
     }
 
     return () => {
       document.removeEventListener("keydown", handleEscapeKey);
-      document.body.style.overflow = "";
+      document.body.style.overflow = ""; // Restore scrolling when modal is closed
     };
   }, [isOpen, onClose]);
 
@@ -136,6 +135,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
       [field]: value,
     }));
 
+    // Clear error for this field if it exists
     if (errors[field]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -156,12 +156,13 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
       if (!formData.phone) newErrors.phone = "Phone number is required";
       if (!formData.bloodType) newErrors.bloodType = "Blood type is required";
     } else if (currentStep === 2) {
+      if (!formData.donationType)
+        newErrors.donationType = "Please select a donation Type";
+    } else if (currentStep === 3) {
       if (!formData.donationCenter)
         newErrors.donationCenter = "Please select a donation center";
       if (!formData.appointmentDate)
         newErrors.appointmentDate = "Please select an appointment date";
-      if (!formData.isOkayToDonate)
-        newErrors.isOkayToDonate = "You must confirm you are okay to donate";
     }
 
     setErrors(newErrors);
@@ -170,6 +171,15 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
 
   const handleNext = () => {
     if (validateStep(step)) {
+      if (step === 2 && !isEligible) {
+        // Prevent moving to step 3 if not eligible
+        setErrors({
+          ...errors,
+          eligibility:
+            "You are not eligible to proceed due to health concerns. Please consult with medical staff.",
+        });
+        return;
+      }
       setStep((prev) => prev + 1);
     }
   };
@@ -181,6 +191,11 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (step < 3) {
+      // Just move to the next step
+      handleNext();
+      return;
+    }
     if (!formData.termsAccepted) {
       setErrors({ termsAccepted: "You must accept the terms and conditions" });
       return;
@@ -189,7 +204,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
     setIsSubmitting(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
 
       onSubmit({
         name: formData.name,
@@ -202,6 +217,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
           )?.name || "Unknown",
       });
 
+      // Reset form
       setFormData({
         name: "",
         email: "",
@@ -213,7 +229,6 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
         hasMedication: false,
         donationType: "whole",
         appointmentDate: "",
-        isOkayToDonate: false,
         termsAccepted: false,
       });
       setStep(1);
@@ -238,6 +253,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
         aria-labelledby="modal-title"
       >
         <div className="p-6">
+          {/* Header */}
           <div className="flex justify-between items-center mb-4">
             <h2
               id="modal-title"
@@ -259,6 +275,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
 
           <form onSubmit={handleSubmit}>
             <div className="py-4">
+              {/* Progress Indicator */}
               <div className="mb-6">
                 <div className="flex justify-between mb-2">
                   {[1, 2, 3].map((i) => (
@@ -286,6 +303,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                 </div>
               </div>
 
+              {/* Step 1: Personal Information */}
               {step === 1 && (
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium">Personal Information</h3>
@@ -363,7 +381,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                       <div className="relative">
                         <button
                           type="button"
-                          className="w-full px-3 py-2 text-left border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 flex justify-between items-center dark:bg-gray-700 dark:text-white"
+                          className="w-full px-3 py-2 text-left border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 flex justify-between itemsamna-center dark:bg-gray-700 dark:text-white"
                           onClick={() =>
                             setBloodTypeDropdownOpen(!bloodTypeDropdownOpen)
                           }
@@ -420,11 +438,10 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                 </div>
               )}
 
+              {/* Step 2: Eligibility Check */}
               {step === 2 && (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">
-                    Eligibility & Appointment Details
-                  </h3>
+                  <h3 className="text-lg font-medium">Eligibility Check</h3>
 
                   <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md p-4 flex gap-3">
                     <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
@@ -486,29 +503,22 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                         staff at donation center)
                       </label>
                     </div>
-
-                    <div className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        id="isOkayToDonate"
-                        className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500 dark:border-gray-600 dark:bg-gray-700"
-                        checked={formData.isOkayToDonate}
-                        onChange={(e) =>
-                          handleChange("isOkayToDonate", e.target.checked)
-                        }
-                      />
-                      <label htmlFor="isOkayToDonate" className="text-sm">
-                        I confirm I am okay to donate
-                      </label>
-                    </div>
-                    {errors.isOkayToDonate && (
-                      <p className="text-sm text-red-500">
-                        {errors.isOkayToDonate}
-                      </p>
-                    )}
                   </div>
 
-                  {!isEligible && (
+                  {isEligible ? (
+                    <div className="bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800 rounded-md p-4 flex gap-3">
+                      <Check className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <h4 className="font-medium text-green-800 dark:text-green-300">
+                          Eligible to Donate
+                        </h4>
+                        <p className="text-sm text-green-700 dark:text-green-200">
+                          You are eligible to proceed with scheduling your
+                          donation.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
                     <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-md p-4 flex gap-3">
                       <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
                       <div>
@@ -516,13 +526,17 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                           Eligibility Concern
                         </h4>
                         <p className="text-sm text-red-700 dark:text-red-200">
-                          Based on your responses, you may not be eligible to
-                          donate at this time. You can still schedule an
-                          appointment, but please consult with the medical
-                          staff.
+                          Based on your responses, you are not eligible to
+                          donate at this time due to recent illness or
+                          tattoos/piercings. Please consult with medical staff
+                          for further guidance.
                         </p>
                       </div>
                     </div>
+                  )}
+
+                  {errors.eligibility && (
+                    <p className="text-sm text-red-500">{errors.eligibility}</p>
                   )}
 
                   <div className="pt-4">
@@ -627,161 +641,125 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                       </label>
                     </div>
                   </div>
-
-                  <div className="space-y-2" ref={centerRef}>
-                    <label
-                      htmlFor="donationCenter"
-                      className="block text-sm font-medium"
-                    >
-                      Donation Center
-                    </label>
-                    <div className="relative">
-                      <button
-                        type="button"
-                        className="w-full px-3 py-2 text-left border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 flex justify-between items-center dark:bg-gray-700 dark:text-white"
-                        onClick={() =>
-                          setCenterDropdownOpen(!centerDropdownOpen)
-                        }
-                      >
-                        {donationCenters.find(
-                          (c) => c.id.toString() === formData.donationCenter
-                        )?.name || "Select a donation center"}
-                        <svg
-                          className="h-5 w-5 text-gray-400"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-
-                      {centerDropdownOpen && (
-                        <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg rounded-md border border-gray-200 dark:border-gray-700 py-1 max-h-60 overflow-auto">
-                          {donationCenters.map((center) => (
-                            <button
-                              key={center.id}
-                              type="button"
-                              className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-                              onClick={() => {
-                                handleChange(
-                                  "donationCenter",
-                                  center.id.toString()
-                                );
-                                setCenterDropdownOpen(false);
-                              }}
-                            >
-                              {center.name}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    {errors.donationCenter && (
-                      <p className="text-sm text-red-500">
-                        {errors.donationCenter}
-                      </p>
-                    )}
-                  </div>
-
-                  {formData.donationCenter && (
-                    <div className="flex items-start gap-2 text-sm">
-                      <MapPin className="h-4 w-4 text-gray-400 mt-0.5" />
-                      <span className="text-gray-600 dark:text-gray-300">
-                        {
-                          donationCenters.find(
-                            (c) => c.id.toString() === formData.donationCenter
-                          )?.address
-                        }
-                      </span>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="appointmentDate"
-                      className="block text-sm font-medium"
-                    >
-                      Appointment Date
-                    </label>
-                    <div className="relative">
-                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <input
-                        id="appointmentDate"
-                        type="date"
-                        className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
-                        min={new Date().toISOString().split("T")[0]}
-                        value={formData.appointmentDate}
-                        onChange={(e) =>
-                          handleChange("appointmentDate", e.target.value)
-                        }
-                      />
-                    </div>
-                    {errors.appointmentDate && (
-                      <p className="text-sm text-red-500">
-                        {errors.appointmentDate}
-                      </p>
-                    )}
-                  </div>
                 </div>
               )}
 
+              {/* Step 3: Schedule Appointment */}
               {step === 3 && (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Confirm & Submit</h3>
+                  <h3 className="text-lg font-medium">Schedule Appointment</h3>
 
                   <div className="space-y-4">
-                    <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md p-4 flex gap-3">
-                      <Info className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <h4 className="font-medium text-blue-800 dark:text-blue-300">
-                          Review Your Details
-                        </h4>
-                        <p className="text-sm text-blue-700 dark:text-blue-200">
-                          Please ensure all information is correct before
-                          submitting.
-                        </p>
+                    <div className="space-y-2" ref={centerRef}>
+                      <label
+                        htmlFor="donationCenter"
+                        className="block text-sm font-medium"
+                      >
+                        Donation Center
+                      </label>
+                      <div className="relative">
+                        <button
+                          type="button"
+                          className="w-full px-3 py-2 text-left border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 flex justify-between items-center dark:bg-gray-700 dark:text-white"
+                          onClick={() =>
+                            setCenterDropdownOpen(!centerDropdownOpen)
+                          }
+                        >
+                          {donationCenters.find(
+                            (c) => c.id.toString() === formData.donationCenter
+                          )?.name || "Select a donation center"}
+                          <svg
+                            className="h-5 w-5 text-gray-400"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+
+                        {centerDropdownOpen && (
+                          <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg rounded-md border border-gray-200 dark:border-gray-700 py-1 max-h-60 overflow-auto">
+                            {donationCenters.map((center) => (
+                              <button
+                                key={center.id}
+                                type="button"
+                                className="w-full text-left px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                onClick={() => {
+                                  handleChange(
+                                    "donationCenter",
+                                    center.id.toString()
+                                  );
+                                  setCenterDropdownOpen(false);
+                                }}
+                              >
+                                {center.name}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
+
+                      {/* Add input field to allow manual entry */}
+                      <input
+                        type="text"
+                        placeholder="Or enter a donation center manually"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                        value={formData.manualDonationCenter || ""}
+                        onChange={(e) =>
+                          handleChange("manualDonationCenter", e.target.value)
+                        }
+                      />
+
+                      {errors.donationCenter && (
+                        <p className="text-sm text-red-500">
+                          {errors.donationCenter}
+                        </p>
+                      )}
                     </div>
 
+                    {/* Show address or manual input */}
+                    {(formData.donationCenter ||
+                      formData.manualDonationCenter) && (
+                      <div className="flex items-start gap-2 text-sm">
+                        <MapPin className="h-4 w-4 text-gray-400 mt-0.5" />
+                        <span className="text-gray-600 dark:text-gray-300">
+                          {formData.manualDonationCenter ||
+                            donationCenters.find(
+                              (c) => c.id.toString() === formData.donationCenter
+                            )?.address}
+                        </span>
+                      </div>
+                    )}
+
                     <div className="space-y-2">
-                      <p className="text-sm">
-                        <strong>Name:</strong> {formData.name}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Email:</strong> {formData.email}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Phone:</strong> {formData.phone}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Blood Type:</strong> {formData.bloodType}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Donation Center:</strong>{" "}
-                        {
-                          donationCenters.find(
-                            (c) => c.id.toString() === formData.donationCenter
-                          )?.name
-                        }
-                      </p>
-                      <p className="text-sm">
-                        <strong>Appointment Date:</strong>{" "}
-                        {formData.appointmentDate || "Not selected"}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Donation Type:</strong>{" "}
-                        {formData.donationType.replace("-", " ").toUpperCase()}
-                      </p>
-                      <p className="text-sm">
-                        <strong>Eligibility:</strong>{" "}
-                        {formData.isOkayToDonate
-                          ? "Confirmed okay to donate"
-                          : "Not confirmed"}
-                      </p>
+                      <label
+                        htmlFor="lastDonationDate"
+                        className="block text-sm font-medium"
+                      >
+                        Last Donation Date
+                      </label>
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                        <input
+                          id="lastDonationDate"
+                          type="date"
+                          className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                          // 👇 NO min attribute anymore, so user can pick past dates
+                          value={formData.lastDonationDate}
+                          onChange={(e) =>
+                            handleChange("lastDonationDate", e.target.value)
+                          }
+                        />
+                      </div>
+                      {errors.lastDonationDate && (
+                        <p className="text-sm text-red-500">
+                          {errors.lastDonationDate}
+                        </p>
+                      )}
                     </div>
 
                     <div className="pt-4">
@@ -811,6 +789,7 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
               )}
             </div>
 
+            {/* Footer */}
             <div className="flex justify-end gap-3 mt-6">
               {step > 1 && (
                 <button
@@ -826,7 +805,12 @@ export function DonateBloodModal({ isOpen, onClose, onSubmit }) {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                  disabled={step === 2 && !isEligible}
+                  className={`px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                    step === 2 && !isEligible
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
                 >
                   Continue
                 </button>

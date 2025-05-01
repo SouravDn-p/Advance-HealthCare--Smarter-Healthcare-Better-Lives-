@@ -13,15 +13,23 @@ import {
   FiActivity,
   FiHeart,
   FiMessageSquare,
+  FiInfo,
 } from "react-icons/fi";
+import { IoMdContact } from "react-icons/io";
+import { FaUserCircle } from "react-icons/fa";
+import { MdOutlineDashboard, MdOutlineLogout } from "react-icons/md";
+import { BiMoney } from "react-icons/bi";
+
 import logo from "../../assets/logo.png";
 import { AuthContexts } from "../../providers/AuthProvider";
+import { LayoutDashboard } from "lucide-react";
 
 const Navbar = () => {
   const { user, signOutUser, theme, toggleTheme } = useContext(AuthContexts);
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const isDarkMode = true;
 
   const handleSignOut = () => {
     signOutUser()
@@ -93,21 +101,14 @@ const Navbar = () => {
                 <FiHeart className="w-4 h-4" />
                 Doctors
               </NavItem>
-              <NavItem
-                to="/dashboard/AiDiagnosis"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <FiHeart className="w-4 h-4" />
-                AiDiagnosis
+              <NavItem to="/aboutUs" onClick={() => setIsMenuOpen(false)}>
+                <FiInfo className="w-4 h-4" />
+                About Us
               </NavItem>
-              {user && (
-                <>
-                  <NavItem to="/dashboard/dashboard">
-                    <FiMessageSquare className="w-4 h-4" />
-                    Dashboard
-                  </NavItem>
-                </>
-              )}
+              <NavItem to="/contactUs">
+                <FiUser className="w-4 h-4" />
+                Contact Us
+              </NavItem>
             </div>
 
             <div className="flex items-center gap-3">
@@ -163,8 +164,106 @@ const Navbar = () => {
                     </div>
                     <FiChevronDown className="w-4 h-4" />
                   </button>
-
                   {showDropdown && (
+                    <div
+                      className={`absolute right-0 mt-2 w-56 rounded-xl shadow-2xl overflow-hidden z-50 backdrop-blur-lg animate-fadeIn ${
+                        isDarkMode
+                          ? "bg-gradient-to-b from-gray-800/90 to-gray-900/90 border border-indigo-700/40"
+                          : "bg-gradient-to-b from-white/90 to-indigo-100/90 border border-indigo-200/40"
+                      }`}
+                    >
+                      <div
+                        className={`px-4 py-3 ${
+                          isDarkMode
+                            ? "border-b border-indigo-700/50"
+                            : "border-b border-indigo-200/50"
+                        }`}
+                      >
+                        <p
+                          className={`font-semibold text-sm ${
+                            isDarkMode ? "text-white" : "text-gray-800"
+                          }`}
+                        >
+                          {user?.displayName || "User"}
+                        </p>
+                        <p
+                          className={`text-xs truncate ${
+                            isDarkMode ? "text-indigo-200" : "text-indigo-600"
+                          }`}
+                        >
+                          {user?.email}
+                        </p>
+                        <span className="inline-block px-2 py-0.5 mt-1 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full text-white text-xs font-semibold capitalize">
+                          {user?.role || "Guest"}
+                        </span>
+                      </div>
+
+                      {[
+                        {
+                          to: "/dashboard/profile",
+                          icon: <FaUserCircle />,
+                          label: "Your Profile",
+                        },
+                        {
+                          to: "/dashboard/dashboard",
+                          icon: <MdOutlineDashboard />,
+                          label: "Dashboard",
+                        },
+                        {
+                          to: "/dashboard/walletHistory",
+                          icon: <BiMoney />,
+                          label: "Wallet History",
+                        },
+                      ].map((item, index) => (
+                        <NavLink
+                          key={index}
+                          to={item.to}
+                          className={`flex items-center gap-3 py-2 px-4 transition-all duration-200 relative overflow-hidden ${
+                            isDarkMode
+                              ? "text-indigo-100 hover:bg-indigo-700/70 hover:text-white"
+                              : "text-indigo-800 hover:bg-indigo-100 hover:text-indigo-900"
+                          }`}
+                        >
+                          <span
+                            className={`${
+                              isDarkMode ? "text-indigo-300" : "text-indigo-700"
+                            } transition-all duration-300`}
+                          >
+                            {item.icon}
+                          </span>
+                          <span className="relative z-10">{item.label}</span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent hover:from-pink-500/5 hover:to-purple-400/5 transition-all duration-200 opacity-0 hover:opacity-100"></div>
+                        </NavLink>
+                      ))}
+
+                      <div
+                        className={`mt-1 ${
+                          isDarkMode
+                            ? "border-t border-indigo-700/50"
+                            : "border-t border-indigo-200/50"
+                        }`}
+                      >
+                        <button
+                          onClick={handleSignOut}
+                          className={`w-full flex items-center gap-3 py-2 px-4 transition-all duration-200 relative overflow-hidden ${
+                            isDarkMode
+                              ? "text-red-300 hover:bg-red-900/50 hover:text-red-200"
+                              : "text-red-600 hover:bg-red-100 hover:text-red-700"
+                          }`}
+                        >
+                          <MdOutlineLogout
+                            className={`${
+                              isDarkMode ? "text-red-300" : "text-red-600"
+                            }`}
+                          />
+                          <span className="relative z-10">Logout</span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent hover:from-red-500/10 hover:to-red-400/5 transition-all duration-200 opacity-0 hover:opacity-100"></div>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* {showDropdown && (
                     <div className="absolute right-0 mt-2 w-56 rounded-lg bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-10">
                       <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                         <p className="font-medium">
@@ -182,7 +281,7 @@ const Navbar = () => {
                         Logout
                       </button>
                     </div>
-                  )}
+                  )} */}
                 </div>
               )}
 
@@ -210,26 +309,14 @@ const Navbar = () => {
                   <FiHeart className="w-4 h-4" />
                   Doctors
                 </NavItem>
-                <NavItem to="/AiDiagnosis" onClick={() => setIsMenuOpen(false)}>
-                  <FiHeart className="w-4 h-4" />
-                  AiDiagnosis
+                <NavItem to="/aboutUs" onClick={() => setIsMenuOpen(false)}>
+                  <FiInfo className="w-4 h-4" />
+                  About Us
                 </NavItem>
-                {user && (
-                  <>
-                    <NavItem to="/dashboard/appointments">
-                      <FiClipboard className="w-4 h-4" />
-                      Appointments
-                    </NavItem>
-                    <NavItem to="/dashboard/medical-records">
-                      <FiActivity className="w-4 h-4" />
-                      Medical Records
-                    </NavItem>
-                    <NavItem to="/dashboard/consultation">
-                      <FiMessageSquare className="w-4 h-4" />
-                      Telemedicine
-                    </NavItem>
-                  </>
-                )}
+                <NavItem to="/contactUs">
+                  <FiUser className="w-4 h-4" />
+                  Contact Us
+                </NavItem>
                 {!user && (
                   <div className="flex flex-col gap-2 p-2">
                     <button

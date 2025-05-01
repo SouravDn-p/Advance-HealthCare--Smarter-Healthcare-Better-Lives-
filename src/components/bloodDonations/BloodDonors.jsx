@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
   Search,
   Filter,
@@ -14,89 +14,35 @@ import {
 import { DonateBloodModal } from "./DonateBloodModal";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
 import Swal from "sweetalert2";
-
-// Sample data - in a real app, this would come from an API
-const sampleDonors = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    bloodType: "O+",
-    location: "Downtown Medical Center",
-    lastDonation: "2023-12-15",
-    contact: "+1 (555) 123-4567",
-    email: "sarah.j@example.com",
-    avatar: "/placeholder.svg?height=40&width=40",
-    eligibleToDonateDays: 0,
-  },
-  {
-    id: 2,
-    name: "Michael Chen",
-    bloodType: "A-",
-    location: "Westside Hospital",
-    lastDonation: "2023-11-03",
-    contact: "+1 (555) 987-6543",
-    email: "mchen@example.com",
-    avatar: "/placeholder.svg?height=40&width=40",
-    eligibleToDonateDays: 12,
-  },
-  {
-    id: 3,
-    name: "Aisha Patel",
-    bloodType: "B+",
-    location: "Central Health Clinic",
-    lastDonation: "2024-01-20",
-    contact: "+1 (555) 456-7890",
-    email: "aisha.p@example.com",
-    avatar: "/placeholder.svg?height=40&width=40",
-    eligibleToDonateDays: 0,
-  },
-  {
-    id: 4,
-    name: "James Wilson",
-    bloodType: "AB+",
-    location: "Northside Medical",
-    lastDonation: "2023-10-05",
-    contact: "+1 (555) 234-5678",
-    email: "jwilson@example.com",
-    avatar: "/placeholder.svg?height=40&width=40",
-    eligibleToDonateDays: 45,
-  },
-  {
-    id: 5,
-    name: "Elena Rodriguez",
-    bloodType: "O-",
-    location: "Southside Health Center",
-    lastDonation: "2023-12-28",
-    contact: "+1 (555) 876-5432",
-    email: "elena.r@example.com",
-    avatar: "/placeholder.svg?height=40&width=40",
-    eligibleToDonateDays: 0,
-  },
-  {
-    id: 6,
-    name: "David Kim",
-    bloodType: "A+",
-    location: "Eastside Hospital",
-    lastDonation: "2023-11-15",
-    contact: "+1 (555) 345-6789",
-    email: "dkim@example.com",
-    avatar: "/placeholder.svg?height=40&width=40",
-    eligibleToDonateDays: 30,
-  },
-];
+import { AuthContexts } from "../../providers/AuthProvider";
+import Loader from "../../extra/Loader";
 
 export function BloodDonors() {
   const axiosPublic = useAxiosPublic();
-  const [donors, setDonors] = useState(sampleDonors);
+  const [donors, setDonors] = useState([
+    {
+      _id: 1,
+      name: "Sarah Johnson",
+      bloodType: "O+",
+      location: "Downtown Medical Center",
+      lastDonation: "2023-12-15",
+      contact: "+1 (555) 123-4567",
+      email: "sarah.j@example.com",
+      avatar: "/placeholder.svg?height=40&width=40",
+      eligibleToDonateDays: 0,
+    },
+  ]);
   const [searchTerm, setSearchTerm] = useState("");
   const [bloodTypeFilter, setBloodTypeFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [bloodTypeDropdownOpen, setBloodTypeDropdownOpen] = useState(false);
+  const { loader, setLoader } = useContext(AuthContexts);
 
   // Filter donors based on search term and blood type
   useEffect(() => {
-    let filteredDonors = sampleDonors;
+    setLoader(true);
+    let filteredDonors = donors;
 
     // Filter by search term
     if (searchTerm) {
@@ -132,13 +78,29 @@ export function BloodDonors() {
     }
 
     setDonors(filteredDonors);
+    setLoader(false);
   }, [searchTerm, bloodTypeFilter, activeTab]);
+
+  useEffect(() => {
+    setLoader(true);
+    const fetchDonors = async () => {
+      try {
+        const response = await axiosPublic.get("/bloodDonors");
+        setDonors(response.data);
+      } catch (error) {
+        console.error("Error fetching donors:", error);
+      }
+    };
+
+    fetchDonors();
+    setLoader(false);
+  }, [axiosPublic, setDonors, setLoader]);
 
   // Handle adding a new donor
   const handleAddDonor = async (newDonor) => {
     // In a real app, you would send this to an API
     const donor = {
-      id: sampleDonors.length + 1,
+      id: donors.length + 1,
       ...newDonor,
       avatar: "/placeholder.svg?height=40&width=40",
       lastDonation: new Date().toISOString().split("T")[0],
@@ -146,6 +108,7 @@ export function BloodDonors() {
     };
 
     setDonors((prevDonors) => [donor, ...prevDonors]);
+    console.log("donor", donor);
 
     const response = await axiosPublic.post("/addDonor", {
       donor,
@@ -168,6 +131,10 @@ export function BloodDonors() {
 
     setIsModalOpen(false);
   };
+
+  if (loader) {
+    <Loader />;
+  }
 
   return (
     <div className="container mx-auto px-4 py-6 ">

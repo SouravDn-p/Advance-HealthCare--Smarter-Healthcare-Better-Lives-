@@ -26,6 +26,8 @@ import Announcements from "../components/dashboard/admin/announcement/Announceme
 import FeedbackComplaints from "../components/dashboard/shared/feedback/FeedbackComplaints";
 import Settings from "../components/dashboard/shared/setting/Settings";
 import HelpSupportPage from "../components/dashboard/shared/helpAndSupport/HelpSupportPage";
+import ContactUs from "../components/contract/ContractUs";
+import AboutUs from "../components/abouUs/AboutUs";
 
 const DoctorsCategoryWrapper = () => {
   const { speciality } = useParams();
@@ -64,6 +66,14 @@ export const router = createBrowserRouter([
       {
         path: "/doctors",
         element: <Doctor />,
+      },
+      {
+        path: "/contactUs",
+        element: <ContactUs />,
+      },
+      {
+        path: "/aboutUs",
+        element: <AboutUs />,
       },
       {
         path: "/emergency",
