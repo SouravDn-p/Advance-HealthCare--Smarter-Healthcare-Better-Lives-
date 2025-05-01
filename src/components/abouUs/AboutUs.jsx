@@ -14,7 +14,7 @@ import {
 import { FaHeartbeat, FaGlobe, FaShieldAlt, FaUserCheck } from "react-icons/fa";
 import { FiBell, FiFileText, FiGrid } from "react-icons/fi";
 import { AuthContexts } from "../../providers/AuthProvider";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import SouravImg from "../../assets/OurTeam/souravdebnath.jpg";
 import SudiptaImg from "../../assets/OurTeam/sudiptaroy.jpg";
 import JasminImg from "../../assets/OurTeam/jasminaramim.jpg";
@@ -24,6 +24,7 @@ import AbirImg from "../../assets/OurTeam/abir.jpg";
 import useAuth from "../../hooks/useAuth";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
 import Swal from "sweetalert2";
+import FeedbackComponent from "./FeedbackComponent";
 
 const AboutUs = () => {
   const howItWorksRef = useRef(null);
@@ -745,7 +746,7 @@ const AboutUs = () => {
                 onChange={(e) => setFeedback(e.target.value)}
               ></textarea>
 
-              <div className="mt-6 flex justify-center">
+              <div className="mt-6 gap-8 grid grid-cols-1 md:flex justify-center">
                 <button
                   onClick={() => {
                     handleSubmit();
@@ -785,6 +786,16 @@ const AboutUs = () => {
                 >
                   Submit Feedback
                 </button>
+                <NavLink
+                  to={"/dashboard/feedback"}
+                  className={`px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 focus:scale-105 focus:outline-none shadow-lg bg-gradient-to-r from-red-600 to-red-700 text-white hover:shadow-blue-500/30 hover:brightness-110 ${
+                    isDarkMode
+                      ? "bg-gray-700 text-gray-400 cursor-not-allowed"
+                      : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  }`}
+                >
+                  Submit Complains
+                </NavLink>
               </div>
             </div>
           </div>
@@ -805,6 +816,7 @@ const AboutUs = () => {
           }
         `}</style>
       </div>
+      {/* <FeedbackComponent /> */}
 
       {/* CTA Section - Enhanced with Floating Elements */}
       {!user && (

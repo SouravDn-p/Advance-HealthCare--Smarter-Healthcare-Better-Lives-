@@ -2,7 +2,7 @@
 
 import { useContext, useState } from "react";
 import { signInWithPopup, signOut, GoogleAuthProvider } from "firebase/auth";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthContexts } from "../../providers/AuthProvider";
@@ -97,6 +97,12 @@ const Login = () => {
             <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-6">
               Welcome Back
             </h2>
+            <NavLink
+              to="/"
+              className="w-full px-4 py-3 mb-3 flex items-center justify-center gap-2 text-white bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors duration-300 disabled:opacity-50"
+            >
+              Home page
+            </NavLink>
 
             {user ? (
               <div className="text-center space-y-4">

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   MessageSquare,
   Search,
@@ -522,8 +522,8 @@ const FeedbackComplaints = () => {
           </div>
         </div>
       ) : (
-        <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+        <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700 ">
             <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
                 <th

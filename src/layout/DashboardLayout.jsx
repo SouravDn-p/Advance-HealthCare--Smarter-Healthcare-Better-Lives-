@@ -35,7 +35,7 @@ import { FiMessageSquare } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
 import { Outlet } from "react-router-dom";
 import { CgProfile } from "react-icons/cg";
-import { FaHome } from "react-icons/fa";
+import { FaBars, FaHome } from "react-icons/fa";
 import {
   IoChatbubbleEllipsesOutline,
   IoSettingsOutline,
@@ -53,6 +53,20 @@ const DashboardLayout = () => {
   // Toggle sidebar on mobile
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const getPageName = () => {
+    const path = location.pathname;
+    switch (path) {
+      case "/dashboard":
+        return "Dashboard";
+      case "/dashboard/announcement":
+        return "Announcements";
+      case "/dashboard/profile":
+        return "Profile";
+      default:
+        return "Dashboard";
+    }
   };
 
   // Toggle theme
@@ -489,15 +503,34 @@ const DashboardLayout = () => {
           {/* Desktop Header */}
           <div className="hidden  lg:flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
             <div className="flex-1">
-              <div className="relative max-w-md">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
+              <div className="flex items-center space-x-4">
+                <label
+                  htmlFor="my-drawer-2"
+                  className={`lg:hidden flex items-center justify-center h-10 w-10 rounded-full ${
+                    isDarkMode
+                      ? "bg-gray-700 text-purple-400 hover:bg-gray-600"
+                      : "bg-white text-purple-600 hover:bg-white"
+                  } cursor-pointer transition-colors duration-200`}
+                >
+                  <FaBars size={18} />
+                </label>
+
+                <div className="hidden md:block">
+                  <h1
+                    className={`text-xl font-semibold ${
+                      isDarkMode ? "text-white" : "text-black"
+                    }`}
+                  >
+                    {getPageName()}
+                  </h1>
+                  <p
+                    className={`text-sm ${
+                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                    }`}
+                  >
+                    Welcome back to your dashboard
+                  </p>
                 </div>
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm"
-                />
               </div>
             </div>
             <div className="flex items-center gap-4">

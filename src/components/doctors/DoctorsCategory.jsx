@@ -81,8 +81,8 @@ const DoctorsCategory = ({ speciality }) => {
       if (!speciality) return;
 
       try {
-        const res = await fetch(`http://localhost:3000/doctors/${speciality}`);
-        const data = await res.json();
+        const res = await axiosPublic.get(`/doctors/${speciality}`);
+        const data = await res.data;
         console.log("Fetched Data:", data);
 
         // Filter the doctors based on speciality (if needed)
