@@ -30,19 +30,30 @@ import {
   BarChart2,
   MessageCircle,
   Megaphone,
+  ClipboardList,
+  FolderOpen,
+  MessageCircleCode,
+  FilePlus2,
 } from "lucide-react";
 import { FiMessageSquare } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
 import { Outlet } from "react-router-dom";
-import { CgProfile } from "react-icons/cg";
-import { FaBars, FaHome } from "react-icons/fa";
+import {
+  FaAmbulance,
+  FaBars,
+  FaBell,
+  FaHome,
+  FaUserMd,
+  FaUserNurse,
+} from "react-icons/fa";
 import {
   IoChatbubbleEllipsesOutline,
   IoSettingsOutline,
 } from "react-icons/io5";
+import { FaHouseMedical } from "react-icons/fa6";
 
 const DashboardLayout = () => {
-  const { user, theme, setTheme, dbUser } = useAuth();
+  const { user, theme, dbUser, toggleTheme } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -67,11 +78,6 @@ const DashboardLayout = () => {
       default:
         return "Dashboard";
     }
-  };
-
-  // Toggle theme
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light");
   };
 
   // Close sidebar when clicking outside on mobile
@@ -193,8 +199,8 @@ const DashboardLayout = () => {
   const adminNavigationItems = [
     {
       name: "Admin Dashboard",
-      icon: <Home className="w-5 h-5" />,
-      section: "dashboard/admin",
+      icon: <FaHouseMedical className="w-5 h-5" />,
+      section: "dashboard/dashboard",
     },
     {
       name: "Manage Doctors",
@@ -212,9 +218,19 @@ const DashboardLayout = () => {
       section: "dashboard/manageAppointments",
     },
     {
-      name: "Manage Blood Donors",
+      name: "Ambulances",
+      icon: <FaAmbulance className="w-5 h-5" />,
+      section: "dashboard/manageAmbulance",
+    },
+    {
+      name: "Blood Donors",
       icon: <Droplet className="w-5 h-5" />,
       section: "dashboard/bloodDonors",
+    },
+    {
+      name: "Staff",
+      icon: <FaUserNurse className="w-5 h-5" />,
+      section: "dashboard/staff",
     },
     {
       name: "Health Reports",
@@ -231,6 +247,63 @@ const DashboardLayout = () => {
       name: "Announcements",
       icon: <Megaphone className="w-5 h-5" />,
       section: "dashboard/announcements",
+    },
+    {
+      name: "Settings",
+      icon: <Settings className="w-5 h-5" />,
+      section: "dashboard/settings",
+    },
+  ];
+  const doctorNavigationItems = [
+    {
+      name: "Doctor Dashboard",
+      icon: <FaUserMd className="w-5 h-5" />,
+      section: "dashboard/dashboard",
+    },
+    {
+      name: "Appointments",
+      icon: <Calendar className="w-5 h-5" />,
+      section: "dashboard/appointmentsScheduling",
+    },
+    {
+      name: "Patient Details",
+      icon: <User className="w-5 h-5" />,
+      section: "dashboard/patientDetails",
+    },
+    {
+      name: "Medical Records",
+      icon: <FileText className="w-5 h-5" />,
+      section: "dashboard/DoctorMedicalRecords",
+    },
+    {
+      name: "Prescriptions",
+      icon: <ClipboardList className="w-5 h-5" />,
+      section: "dashboard/prescriptions",
+    },
+    {
+      name: "Lab Results",
+      icon: <FolderOpen className="w-5 h-5" />,
+      section: "dashboard/labResults",
+    },
+    {
+      name: "Messages",
+      icon: <MessageCircleCode className="w-5 h-5" />,
+      section: "dashboard/messages",
+    },
+    {
+      name: "Notifications",
+      icon: <FaBell className="w-5 h-5" />,
+      section: "dashboard/notifications",
+    },
+    {
+      name: "Analytics",
+      icon: <BarChart2 className="w-5 h-5" />,
+      section: "dashboard/analytics",
+    },
+    {
+      name: "Profile",
+      icon: <FilePlus2 className="w-5 h-5" />,
+      section: "dashboard/DoctorProfile",
     },
     {
       name: "Settings",
@@ -370,6 +443,8 @@ const DashboardLayout = () => {
             <nav className="space-y-1">
               {(dbUser?.role === "admin"
                 ? adminNavigationItems
+                : dbUser?.role === "doctor"
+                ? doctorNavigationItems
                 : navigationItems
               ).map((item) => (
                 <NavLink

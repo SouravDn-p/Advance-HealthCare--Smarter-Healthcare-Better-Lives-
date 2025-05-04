@@ -13,6 +13,7 @@ import useAxiosPublic from "../hooks/useAxiosPublic";
 export const AuthContexts = createContext("");
 
 const AuthProvider = ({ children }) => {
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [user, setUser] = useState(null);
   const [dbUser, setDbUser] = useState(null);
   const [response, setResponse] = useState(null);
@@ -28,11 +29,21 @@ const AuthProvider = ({ children }) => {
     setTheme(newTheme);
     localStorage.setItem("theme", newTheme);
     document.documentElement.setAttribute("data-theme", newTheme);
+    setIsDarkMode((prevMode) => {
+      const newMode = !prevMode;
+      localStorage.setItem("theme", newMode ? "dark" : "light");
+      return newMode;
+    });
   };
 
   useEffect(() => {
     localStorage.setItem("theme", theme);
     document.documentElement.setAttribute("data-theme", theme);
+
+    const storedTheme = localStorage.getItem("theme");
+    if (storedTheme === "dark") {
+      setIsDarkMode(true);
+    }
   }, [theme]);
 
   // get specific user data
@@ -136,6 +147,8 @@ const AuthProvider = ({ children }) => {
     setDbUser,
     errorMessage,
     setErrorMessage,
+    isDarkMode,
+    setIsDarkMode,
   };
 
   return (

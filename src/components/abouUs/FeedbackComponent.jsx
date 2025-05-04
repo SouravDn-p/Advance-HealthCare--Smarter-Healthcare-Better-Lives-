@@ -5,8 +5,7 @@ import useAxiosPublic from "../../hooks/useAxiosPublic";
 import Swal from "sweetalert2";
 
 const FeedbackComponent = () => {
-  const { isDarkMode } = false;
-  const { dbUser } = useAuth();
+  const { dbUser, isDarkMode } = useAuth();
   const axiosPublic = useAxiosPublic();
 
   const [formData, setFormData] = useState({

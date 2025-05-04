@@ -28,10 +28,9 @@ import FeedbackComponent from "./FeedbackComponent";
 
 const AboutUs = () => {
   const howItWorksRef = useRef(null);
-  const { dbUser } = useAuth();
+  const { dbUser, isDarkMode } = useAuth();
   const axiosPublic = useAxiosPublic();
   const { user } = useContext(AuthContexts);
-  const isDarkMode = true;
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },

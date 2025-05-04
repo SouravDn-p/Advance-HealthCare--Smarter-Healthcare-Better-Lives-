@@ -25,11 +25,11 @@ import { AuthContexts } from "../../providers/AuthProvider";
 import { LayoutDashboard } from "lucide-react";
 
 const Navbar = () => {
-  const { user, signOutUser, theme, toggleTheme } = useContext(AuthContexts);
+  const { user, signOutUser, theme, toggleTheme, isDarkMode } =
+    useContext(AuthContexts);
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
-  const isDarkMode = true;
 
   const handleSignOut = () => {
     signOutUser()

@@ -28,6 +28,12 @@ import Settings from "../components/dashboard/shared/setting/Settings";
 import HelpSupportPage from "../components/dashboard/shared/helpAndSupport/HelpSupportPage";
 import ContactUs from "../components/contract/ContractUs";
 import AboutUs from "../components/abouUs/AboutUs";
+import AmbulanceManagement from "../components/dashboard/admin/ambulance/AmbulanceManagement";
+import PatientManagement from "../components/dashboard/admin/patient/PatientManagement";
+import AppointmentScheduling from "../components/dashboard/doctors/Appointment/AppointmentScheduling";
+import DoctorProfile from "../components/dashboard/doctors/Profile/DoctorProfile";
+import DoctorMedicalRecords from "../components/dashboard/doctors/medicalRecord/DoctorMedicalRecords";
+import AppointmentManage from "../components/dashboard/admin/appointment/AppointmentManage";
 
 const DoctorsCategoryWrapper = () => {
   const { speciality } = useParams();
@@ -75,10 +81,7 @@ export const router = createBrowserRouter([
         path: "/aboutUs",
         element: <AboutUs />,
       },
-      {
-        path: "/emergency",
-        element: <EmergencyServices />,
-      },
+
       {
         path: "/doctors/:speciality",
         element: (
@@ -119,6 +122,62 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <Telemedicine />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "emergency",
+        element: <EmergencyServices />,
+      },
+
+      //Doctors path
+      {
+        path: "managePatients",
+        element: (
+          <PrivateRoute>
+            <PatientManagement />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "appointmentsScheduling",
+        element: (
+          <PrivateRoute>
+            <AppointmentScheduling />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "DoctorProfile",
+        element: (
+          <PrivateRoute>
+            <DoctorProfile />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "DoctorMedicalRecords",
+        element: (
+          <PrivateRoute>
+            <DoctorMedicalRecords />
+          </PrivateRoute>
+        ),
+      },
+
+      //Admin Pages
+      {
+        path: "manageAmbulance",
+        element: (
+          <PrivateRoute>
+            <AmbulanceManagement />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "manageAppointments",
+        element: (
+          <PrivateRoute>
+            <AppointmentManage />
           </PrivateRoute>
         ),
       },

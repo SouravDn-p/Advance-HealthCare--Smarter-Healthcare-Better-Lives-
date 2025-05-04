@@ -22,9 +22,10 @@ import {
 import useAuth from "../../../hooks/useAuth";
 import useAxiosPublic from "../../../hooks/useAxiosPublic";
 import Swal from "sweetalert2";
+import UnAuthorizedAccess from "../../../extra/errors/UnAuthorizedAccess";
 
 const DoctorManagement = () => {
-  var { doctors, setDoctors } = useAuth();
+  var { doctors, setDoctors, dbUser } = useAuth();
   const axiosPublic = useAxiosPublic();
   // State for doctors list
   // var [doctors, setDoctors] = useState([
@@ -333,6 +334,10 @@ const DoctorManagement = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, filterSpecialty]);
+
+  if (dbUser?.role != "admin") {
+    return <UnAuthorizedAccess />;
+  }
 
   return (
     <div className="p-4 lg:p-6 space-y-6">

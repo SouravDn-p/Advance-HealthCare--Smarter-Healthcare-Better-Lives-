@@ -26,11 +26,14 @@ import {
   Search,
   Menu,
   X,
+  BarChart2Icon,
 } from "lucide-react";
 import useAuth from "../hooks/useAuth";
+import AdminDashboard from "../components/dashboard/admin/dashboard/AdminDashboard";
+import DoctorDashboard from "../components/dashboard/doctors/dashboard/DoctorDashboard";
 
 const Dashboard = () => {
-  const { user, theme } = useAuth();
+  const { user, theme, dbUser } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState([
@@ -240,10 +243,11 @@ const Dashboard = () => {
     return `In ${diffDays} days`;
   };
 
-  // Toggle mobile menu
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  if (dbUser?.role === "admin") {
+    return <AdminDashboard />;
+  } else if (dbUser?.role === "doctor") {
+    return <DoctorDashboard />;
+  }
 
   return (
     <div
@@ -572,7 +576,7 @@ const Dashboard = () => {
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center">
-                      <BarChart2 className="w-5 h-5 text-blue-500 mr-2" />
+                      <BarChart2Icon className="w-5 h-5 text-blue-500 mr-2" />
                       <h3 className="font-medium text-gray-900 dark:text-white">
                         Weight
                       </h3>
