@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import useAuth from "../../hooks/useAuth";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
+import LoadingSpinner from "../../extra/loaders/LoadingSpinner";
 const DoctorsCategory = ({ speciality }) => {
   const { doctors, setDoctors, theme, user, loader, setLoader } = useAuth();
   const axiosPublic = useAxiosPublic();
@@ -111,6 +112,10 @@ const DoctorsCategory = ({ speciality }) => {
     "03:00 PM",
     "04:00 PM",
   ];
+
+  if (loader) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <section

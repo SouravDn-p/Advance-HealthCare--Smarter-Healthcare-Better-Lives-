@@ -109,23 +109,23 @@ const ContactUs = () => {
   const partners = [
     {
       name: "HealthCorp",
-      logo: "https://via.placeholder.com/100x40?text=HealthCorp",
+      logo: "https://healthcorp.com.au/wp-content/uploads/2019/10/HCP-logo-simple.png",
     },
     {
       name: "MediCare",
-      logo: "https://via.placeholder.com/100x40?text=MediCare",
+      logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyeJ_rdVWc7VnXLRmAFBG-8nrsqpH4uLjoLA&s",
     },
     {
       name: "WellnessHub",
-      logo: "https://via.placeholder.com/100x40?text=WellnessHub",
+      logo: "https://wellnesshub.ae/wp-content/uploads/2024/10/Dr-Olas_Gold.svg",
     },
     {
       name: "CarePlus",
-      logo: "https://via.placeholder.com/100x40?text=CarePlus",
+      logo: "https://play-lh.googleusercontent.com/XGezZw9y86rVKSouoBUpsKt0qJWJZGS8u9I7StdWhKOVfOJh3hEuxsBPLiDvevv0IA=w240-h480-rw",
     },
     {
       name: "LifeHealth",
-      logo: "https://via.placeholder.com/100x40?text=LifeHealth",
+      logo: "https://lifehealth.global/wp-content/uploads/2022/06/Lifehealth-new-logo.gif",
     },
   ];
 
@@ -482,7 +482,7 @@ const ContactUs = () => {
             <p className="text-sm mb-4 text-gray-500 dark:text-gray-400">
               Partnered with leading healthcare organizations worldwide
             </p>
-            <div className="flex flex-wrap gap-6 items-center justify-between">
+            <div className="grid grid-cols-3 gap-6 items-center justify-between">
               {partners.map((partner, index) => (
                 <div key={index} className="flex items-center">
                   <img

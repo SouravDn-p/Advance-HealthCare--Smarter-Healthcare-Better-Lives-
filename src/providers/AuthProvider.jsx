@@ -148,7 +148,6 @@ const AuthProvider = ({ children }) => {
     errorMessage,
     setErrorMessage,
     isDarkMode,
-    setIsDarkMode,
   };
 
   return (

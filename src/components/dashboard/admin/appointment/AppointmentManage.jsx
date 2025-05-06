@@ -11,8 +11,11 @@ import {
   FaMoon,
 } from "react-icons/fa";
 import axios from "axios";
+import UnAuthorizedAccess from "../../../../extra/errors/UnAuthorizedAccess";
+import useAuth from "../../../../hooks/useAuth";
 
 const AppointmentManage = ({ isDarkMode, toggleDarkMode }) => {
+  const { dbUser } = useAuth();
   // Sample appointments data
   const [appointments, setAppointments] = useState([
     {
@@ -270,6 +273,10 @@ const AppointmentManage = ({ isDarkMode, toggleDarkMode }) => {
         return "badge";
     }
   };
+
+  if (dbUser?.role != "admin") {
+    return <UnAuthorizedAccess />;
+  }
 
   return (
     <div

@@ -17,6 +17,9 @@ import {
 } from "react-icons/fa";
 import PatientForm from "./PatientForm";
 import PatientDetails from "./PatientDetails";
+import useAuth from "../../../../hooks/useAuth";
+import useAxiosPublic from "../../../../hooks/useAxiosPublic";
+import UnAuthorizedAccess from "../../../../extra/errors/UnAuthorizedAccess";
 
 // Mock data for patients
 const initialPatients = [
@@ -159,6 +162,8 @@ const initialPatients = [
 ];
 
 const PatientManagement = () => {
+  const { dbUser } = useAuth();
+  const axiosPublic = useAxiosPublic();
   const [patients, setPatients] = useState(initialPatients);
   const [filteredPatients, setFilteredPatients] = useState(initialPatients);
   const [searchTerm, setSearchTerm] = useState("");
@@ -329,6 +334,10 @@ const PatientManagement = () => {
     setCurrentPatient(patient);
     setIsDeleteModalOpen(true);
   };
+
+  if (dbUser?.role != "admin") {
+    return <UnAuthorizedAccess />;
+  }
 
   // Open view modal
   const openViewModal = (patient) => {

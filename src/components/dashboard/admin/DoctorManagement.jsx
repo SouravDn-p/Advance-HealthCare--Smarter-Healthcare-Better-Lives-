@@ -82,6 +82,16 @@ const DoctorManagement = () => {
   //   },
   // ]);
 
+  // State for form and UI
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterSpecialty, setFilterSpecialty] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [editingDoctor, setEditingDoctor] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [doctorToDelete, setDoctorToDelete] = useState(null);
+  const [viewMode, setViewMode] = useState("grid"); // grid or table
+
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
@@ -95,16 +105,6 @@ const DoctorManagement = () => {
 
     fetchDoctors();
   }, [axiosPublic, setDoctors]);
-
-  // State for form and UI
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterSpecialty, setFilterSpecialty] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [editingDoctor, setEditingDoctor] = useState(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [doctorToDelete, setDoctorToDelete] = useState(null);
-  const [viewMode, setViewMode] = useState("grid"); // grid or table
 
   // Form state
   const emptyDoctorForm = {

@@ -16,11 +16,8 @@ import { FiBell, FiFileText, FiGrid } from "react-icons/fi";
 import { AuthContexts } from "../../providers/AuthProvider";
 import { Link, NavLink } from "react-router-dom";
 import SouravImg from "../../assets/OurTeam/souravdebnath.jpg";
-import SudiptaImg from "../../assets/OurTeam/sudiptaroy.jpg";
-import JasminImg from "../../assets/OurTeam/jasminaramim.jpg";
-import JoyetaImg from "../../assets/OurTeam/joyetamondal.jpg";
-import RohitImg from "../../assets/OurTeam/rohit.jpg";
-import AbirImg from "../../assets/OurTeam/abir.jpg";
+import fahadImg from "../../assets/OurTeam/sheak_fahad.jpg";
+import NurImg from "../../assets/OurTeam/nur.png";
 import useAuth from "../../hooks/useAuth";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
 import Swal from "sweetalert2";
@@ -102,10 +99,10 @@ const AboutUs = () => {
 
   const teamMembers = [
     {
-      image: SudiptaImg,
+      image: fahadImg,
       name: "Sheak Fahad",
       project_role: "UI Designer and Developer",
-      email: "jasminaramim@gmail.com",
+      email: "fahadsheak@gmail.com",
       expertise: "Frontend Development, MERN Stack, Medical UI Design",
       offer:
         "I crafted intuitive interfaces to enhance patient and provider experiences on the platform.",
@@ -120,10 +117,10 @@ const AboutUs = () => {
         "I ensured the AdvanceHealthcare platform is responsive, user-friendly, and optimized for patient and provider needs.",
     },
     {
-      image: JasminImg,
+      image: NurImg,
       name: "Nur Hasan Hasib",
       project_role: "UI Designer and Developer",
-      email: "jasminaramim@gmail.com",
+      email: "Nur Hasan@gmail.com",
       expertise: "Frontend Development, MERN Stack, Medical UI Design",
       offer:
         "I crafted intuitive interfaces to enhance patient and provider experiences on the platform.",
