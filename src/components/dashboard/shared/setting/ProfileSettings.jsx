@@ -5,32 +5,32 @@ import { Camera, Trash2 } from "lucide-react";
 import useAuth from "../../../../hooks/useAuth";
 
 const ProfileSettings = ({ onSave }) => {
-  const { user } = useAuth();
+  const { user, dbUser } = useAuth();
 
   const [formData, setFormData] = useState({
-    firstName: user?.firstName || "John",
-    lastName: user?.lastName || "Doe",
+    firstName: dbUser?.displayName.split(" ")[0] || "Sourav",
+    lastName: dbUser?.displayName.split(" ").slice(-1)[0] || "Debnath",
     email: user?.email || "john.doe@example.com",
     phone: user?.phone || "+1 (555) 123-4567",
     dateOfBirth: user?.dateOfBirth || "1990-01-01",
-    gender: user?.gender || "male",
-    address: user?.address || "123 Main Street",
-    city: user?.city || "New York",
-    state: user?.state || "NY",
-    zipCode: user?.zipCode || "10001",
-    country: user?.country || "United States",
-    emergencyContact: user?.emergencyContact || "Jane Doe",
-    emergencyPhone: user?.emergencyPhone || "+1 (555) 987-6543",
-    bloodType: user?.bloodType || "O+",
-    allergies: user?.allergies || "None",
-    chronicConditions: user?.chronicConditions || "None",
+    gender: dbUser?.gender || "male",
+    address: dbUser?.address || "221B Baker Street",
+    city: dbUser?.city || "Dhaka",
+    state: dbUser?.state || "Dhaka",
+    zipCode: dbUser?.zipCode || "10001",
+    country: dbUser?.country || "United States",
+    emergencyContact: dbUser?.emergencyContact || "Jane Doe",
+    emergencyPhone: dbUser?.emergencyPhone || "+1 (555) 987-6543",
+    bloodType: dbUser?.bloodType || "O+",
+    allergies: dbUser?.allergies || "None",
+    chronicConditions: dbUser?.chronicConditions || "None",
     bio:
-      user?.bio ||
+      dbUser?.bio ||
       "I'm a healthcare enthusiast focused on preventive care and wellness.",
   });
 
-  const [profileImage, setProfileImage] = useState(user?.profileImage || null);
-  const [previewImage, setPreviewImage] = useState(user?.profileImage || null);
+  const [profileImage, setProfileImage] = useState(dbUser?.dbPhoto || null);
+  const [previewImage, setPreviewImage] = useState(dbUser?.dbPhoto || null);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -197,9 +197,10 @@ const ProfileSettings = ({ onSave }) => {
                 id="email"
                 name="email"
                 value={formData.email}
-                onChange={handleInputChange}
+                // onChange={handleInputChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 required
+                readonly
               />
             </div>
 

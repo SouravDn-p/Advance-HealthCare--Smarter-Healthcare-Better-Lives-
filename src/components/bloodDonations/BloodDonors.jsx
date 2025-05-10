@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import {
   Search,
   Filter,
@@ -13,40 +13,53 @@ import {
 } from "lucide-react";
 import { DonateBloodModal } from "./DonateBloodModal";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
+import useAuth from "../../hooks/useAuth";
 import Swal from "sweetalert2";
-import { AuthContexts } from "../../providers/AuthProvider";
-import Loader from "../../extra/Loader";
+import LoadingSpinner from "../../extra/loaders/LoadingSpinner";
 
 export function BloodDonors() {
   const axiosPublic = useAxiosPublic();
-  const [donors, setDonors] = useState([
-    {
-      _id: 1,
-      name: "Sarah Johnson",
-      bloodType: "O+",
-      location: "Downtown Medical Center",
-      lastDonation: "2023-12-15",
-      contact: "+1 (555) 123-4567",
-      email: "sarah.j@example.com",
-      avatar: "/placeholder.svg?height=40&width=40",
-      eligibleToDonateDays: 0,
-    },
-  ]);
+  const isDarkMode = true;
+  const [allDonors, setAllDonors] = useState([]);
+  const [filteredDonors, setFilteredDonors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [bloodTypeFilter, setBloodTypeFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [bloodTypeDropdownOpen, setBloodTypeDropdownOpen] = useState(false);
-  const { loader, setLoader } = useContext(AuthContexts);
+  const [loader, setLoader] = useState(false);
 
-  // Filter donors based on search term and blood type
+  // Fetch donors from API
   useEffect(() => {
-    setLoader(true);
-    let filteredDonors = donors;
+    const fetchDonors = async () => {
+      setLoader(true);
+      try {
+        const response = await axiosPublic.get("/bloodDonors");
+        setAllDonors(response.data);
+        setFilteredDonors(response.data);
+      } catch (error) {
+        console.error("Error fetching donors:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Failed to fetch donors",
+          text: "Please try again later.",
+          confirmButtonColor: "#3085d6",
+        });
+      } finally {
+        setLoader(false);
+      }
+    };
+
+    fetchDonors();
+  }, [axiosPublic]);
+
+  // Apply filters whenever searchTerm, bloodTypeFilter, activeTab, or allDonors change
+  useEffect(() => {
+    let result = [...allDonors];
 
     // Filter by search term
     if (searchTerm) {
-      filteredDonors = filteredDonors.filter(
+      result = result.filter(
         (donor) =>
           donor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
           donor.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -56,76 +69,56 @@ export function BloodDonors() {
 
     // Filter by blood type
     if (bloodTypeFilter && bloodTypeFilter !== "all") {
-      filteredDonors = filteredDonors.filter(
-        (donor) => donor.bloodType === bloodTypeFilter
-      );
+      result = result.filter((donor) => donor.bloodType === bloodTypeFilter);
     }
 
     // Filter by tab
     if (activeTab === "eligible") {
-      filteredDonors = filteredDonors.filter(
-        (donor) => donor.eligibleToDonateDays > 0
-      );
+      result = result.filter((donor) => donor.eligibleToDonateDays > 0);
     } else if (activeTab === "recent") {
-      // Donors who donated in the last 30 days
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-      filteredDonors = filteredDonors.filter((donor) => {
+      result = result.filter((donor) => {
         const donationDate = new Date(donor.lastDonation);
         return donationDate >= thirtyDaysAgo;
       });
     }
 
-    setDonors(filteredDonors);
-    setLoader(false);
-  }, [searchTerm, bloodTypeFilter, activeTab]);
-
-  useEffect(() => {
-    setLoader(true);
-    const fetchDonors = async () => {
-      try {
-        const response = await axiosPublic.get("/bloodDonors");
-        setDonors(response.data);
-      } catch (error) {
-        console.error("Error fetching donors:", error);
-      }
-    };
-
-    fetchDonors();
-    setLoader(false);
-  }, [axiosPublic, setDonors, setLoader]);
+    setFilteredDonors(result);
+  }, [searchTerm, bloodTypeFilter, activeTab, allDonors]);
 
   // Handle adding a new donor
   const handleAddDonor = async (newDonor) => {
-    // In a real app, you would send this to an API
     const donor = {
-      id: donors.length + 1,
+      _id: (allDonors.length + 1).toString(),
       ...newDonor,
       avatar: "/placeholder.svg?height=40&width=40",
       lastDonation: new Date().toISOString().split("T")[0],
       eligibleToDonateDays: 0,
     };
 
-    setDonors((prevDonors) => [donor, ...prevDonors]);
-    console.log("donor", donor);
-
-    const response = await axiosPublic.post("/addDonor", {
-      donor,
-    });
-    if (response.status === 201) {
-      Swal.fire({
-        icon: "success",
-        title: "Successfully Added Blood Donor",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-    } else {
+    try {
+      const response = await axiosPublic.post("/addDonor", donor);
+      if (response.status === 201) {
+        setAllDonors((prev) => [donor, ...prev]);
+        setFilteredDonors((prev) => [donor, ...prev]);
+        Swal.fire({
+          icon: "success",
+          title: "Successfully Added Blood Donor",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      } else {
+        throw new Error("Failed to add donor");
+      }
+    } catch (error) {
+      console.error("Error adding donor:", error);
       Swal.fire({
         icon: "error",
         title: "Failed to Add Blood Donor",
         text: "Something went wrong. Please try again!",
         confirmButtonText: "Okay",
+        confirmButtonColor: "#3085d6",
       });
     }
 
@@ -133,56 +126,86 @@ export function BloodDonors() {
   };
 
   if (loader) {
-    <Loader />;
+    return <LoadingSpinner />;
   }
 
   return (
-    <div className="container mx-auto px-4 py-6 ">
+    <div
+      className={`container mx-auto px-4 py-6 transition-colors duration-300 ${
+        isDarkMode ? "bg-gray-900 text-gray-200" : "bg-gray-50 text-gray-800"
+      }`}
+    >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Blood Donors</h2>
-          <p className="text-gray-500 dark:text-gray-400">
+          <h2
+            className={`text-3xl font-bold tracking-tight ${
+              isDarkMode ? "text-white" : "text-gray-800"
+            }`}
+          >
+            Blood Donors
+          </h2>
+          <p className="text-gray-400 dark:text-gray-300">
             Manage blood donors and donation records
           </p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 flex items-center gap-2"
+          className="px-4 py-2 rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 flex items-center gap-2 transition-colors duration-200"
+          aria-label="Open donate blood modal"
         >
           <Plus className="h-4 w-4" /> Donate Blood
         </button>
       </div>
 
-      <div className="w-full">
+      <div className="w-full mt-6">
         <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-          <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-md mb-4 sm:mb-0">
+          <div
+            className={`flex space-x-1 p-1 rounded-md transition-colors duration-300 ${
+              isDarkMode ? "bg-gray-800" : "bg-gray-100"
+            }`}
+          >
             <button
-              className={`px-4 py-2 text-sm rounded-md ${
+              className={`px-4 py-2 text-sm rounded-md transition-colors duration-200 ${
                 activeTab === "all"
-                  ? "bg-white dark:bg-gray-700 shadow-sm"
-                  : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
+                  ? isDarkMode
+                    ? "bg-gray-700 text-white"
+                    : "bg-white text-gray-800 shadow-sm"
+                  : isDarkMode
+                  ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                  : "text-gray-600 hover:bg-gray-200 hover:text-gray-800"
               }`}
               onClick={() => setActiveTab("all")}
+              aria-label="Show all donors"
             >
               All Donors
             </button>
             <button
-              className={`px-4 py-2 text-sm rounded-md ${
+              className={`px-4 py-2 text-sm rounded-md transition-colors duration-200 ${
                 activeTab === "eligible"
-                  ? "bg-white dark:bg-gray-700 shadow-sm"
-                  : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
+                  ? isDarkMode
+                    ? "bg-gray-700 text-white"
+                    : "bg-white text-gray-800 shadow-sm"
+                  : isDarkMode
+                  ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                  : "text-gray-600 hover:bg-gray-200 hover:text-gray-800"
               }`}
               onClick={() => setActiveTab("eligible")}
+              aria-label="Show eligible donors"
             >
               Eligible to Donate
             </button>
             <button
-              className={`px-4 py-2 text-sm rounded-md ${
+              className={`px-4 py-2 text-sm rounded-md transition-colors duration-200 ${
                 activeTab === "recent"
-                  ? "bg-white dark:bg-gray-700 shadow-sm"
-                  : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
+                  ? isDarkMode
+                    ? "bg-gray-700 text-white"
+                    : "bg-white text-gray-800 shadow-sm"
+                  : isDarkMode
+                  ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                  : "text-gray-600 hover:bg-gray-200 hover:text-gray-800"
               }`}
               onClick={() => setActiveTab("recent")}
+              aria-label="Show recent donations"
             >
               Recent Donations
             </button>
@@ -190,27 +213,47 @@ export function BloodDonors() {
 
           <div className="flex flex-col sm:flex-row gap-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search
+                className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 ${
+                  isDarkMode ? "text-gray-400" : "text-gray-500"
+                }`}
+              />
               <input
                 type="search"
                 placeholder="Search donors..."
-                className="pl-9 pr-3 py-2 w-full sm:w-[200px] lg:w-[300px] border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                className={`pl-9 pr-3 py-2 w-full sm:w-[200px] lg:w-[300px] border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-200 ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-700 text-gray-200"
+                    : "bg-white border-gray-300 text-gray-800"
+                }`}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                aria-label="Search donors by name, location, or blood type"
               />
             </div>
 
             <div className="relative">
               <button
-                className="flex items-center gap-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md w-full sm:w-[150px] focus:outline-none focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white"
+                className={`flex items-center gap-2 px-3 py-2 border rounded-md w-full sm:w-[150px] focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-200 ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-700 text-gray-200"
+                    : "bg-white border-gray-300 text-gray-800"
+                }`}
                 onClick={() => setBloodTypeDropdownOpen(!bloodTypeDropdownOpen)}
+                aria-label="Toggle blood type filter dropdown"
               >
-                <Filter className="h-4 w-4 text-gray-400" />
+                <Filter
+                  className={`h-4 w-4 ${
+                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                />
                 <span className="text-sm">
                   {bloodTypeFilter || "Blood Type"}
                 </span>
                 <svg
-                  className="h-5 w-5 text-gray-400 ml-auto"
+                  className={`h-5 w-5 ${
+                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                  } ml-auto`}
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -223,13 +266,24 @@ export function BloodDonors() {
               </button>
 
               {bloodTypeDropdownOpen && (
-                <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg rounded-md border border-gray-200 dark:border-gray-700 py-1">
+                <div
+                  className={`absolute z-10 mt-1 w-full shadow-lg rounded-md border py-1 transition-colors duration-200 ${
+                    isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
                   <button
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className={`w-full text-left px-3 py-2 text-sm transition-colors duration-200 ${
+                      isDarkMode
+                        ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                        : "text-gray-800 hover:bg-gray-100 hover:text-gray-900"
+                    }`}
                     onClick={() => {
                       setBloodTypeFilter("");
                       setBloodTypeDropdownOpen(false);
                     }}
+                    aria-label="Select all blood types"
                   >
                     All Types
                   </button>
@@ -237,11 +291,16 @@ export function BloodDonors() {
                     (type) => (
                       <button
                         key={type}
-                        className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                        className={`w-full text-left px-3 py-2 text-sm transition-colors duration-200 ${
+                          isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                            : "text-gray-800 hover:bg-gray-100 hover:text-gray-900"
+                        }`}
                         onClick={() => {
                           setBloodTypeFilter(type);
                           setBloodTypeDropdownOpen(false);
                         }}
+                        aria-label={`Filter by blood type ${type}`}
                       >
                         {type}
                       </button>
@@ -253,7 +312,7 @@ export function BloodDonors() {
           </div>
         </div>
 
-        <DonorsList donors={donors} />
+        <DonorsList donors={filteredDonors} />
       </div>
 
       <DonateBloodModal
@@ -266,12 +325,24 @@ export function BloodDonors() {
 }
 
 function DonorsList({ donors }) {
+  const { isDarkMode } = useAuth();
+
   if (donors.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <Droplet className="h-12 w-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium">No donors found</h3>
-        <p className="text-gray-500 dark:text-gray-400 mt-2">
+        <Droplet
+          className={`h-12 w-12 ${
+            isDarkMode ? "text-red-400" : "text-red-500"
+          }`}
+        />
+        <h3
+          className={`text-lg font-medium ${
+            isDarkMode ? "text-white" : "text-gray-800"
+          }`}
+        >
+          No donors found
+        </h3>
+        <p className="text-gray-400 dark:text-gray-300 mt-2">
           Try adjusting your search or filter criteria
         </p>
       </div>

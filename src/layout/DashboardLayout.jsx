@@ -1,6 +1,6 @@
 "use client";
 
-import { Link, NavLink } from "react-router-dom";
+import { Link, Navigate, NavLink } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
   Calendar,
@@ -53,7 +53,7 @@ import {
 import { FaHouseMedical } from "react-icons/fa6";
 
 const DashboardLayout = () => {
-  const { user, theme, dbUser, toggleTheme } = useAuth();
+  const { user, theme, dbUser, toggleTheme, signOutUser } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -64,6 +64,15 @@ const DashboardLayout = () => {
   // Toggle sidebar on mobile
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const handleSignOut = () => {
+    signOutUser()
+      .then(() => {
+        console.log("User Signed Out");
+        Navigate("/");
+      })
+      .catch((err) => console.error("Sign-Out error:", err.message));
   };
 
   const getPageName = () => {
@@ -557,7 +566,10 @@ const DashboardLayout = () => {
                   Settings
                 </span>
               </NavLink>
-              <button className="w-full flex items-center px-3 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 mt-2">
+              <button
+                onClick={handleSignOut}
+                className="w-full flex items-center px-3 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 mt-2"
+              >
                 <LogOut className="w-5 h-5 mr-3" />
                 <span>Sign Out</span>
               </button>

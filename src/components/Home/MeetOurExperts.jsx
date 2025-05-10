@@ -19,7 +19,7 @@ import useAuth from "../../hooks/useAuth";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
 
 const MeetOurExperts = () => {
-  const { doctors, theme, user } = useAuth();
+  const { doctors, theme, isDarkMode, user } = useAuth();
   const axiosPublic = useAxiosPublic();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
@@ -90,7 +90,7 @@ const MeetOurExperts = () => {
   return (
     <section
       className={`py-16 ${
-        theme === "dark"
+        isDarkMode
           ? "bg-gradient-to-b from-gray-900 to-gray-800 text-gray-200"
           : "bg-gradient-to-r from-[#D3E2CD] to-[#e8f0e5] text-gray-900"
       } transition-all relative duration-300`}
@@ -99,7 +99,7 @@ const MeetOurExperts = () => {
         <div className="text-center mb-16">
           <h2
             className={`text-3xl md:text-4xl font-bold ${
-              theme === "dark" ? "text-white" : "text-gray-900"
+              isDarkMode ? "text-white" : "text-gray-900"
             } mb-4 relative inline-block`}
           >
             Meet Our Expert Doctors
@@ -107,7 +107,7 @@ const MeetOurExperts = () => {
           </h2>
           <p
             className={`text-lg ${
-              theme === "dark" ? "text-gray-400" : "text-gray-600"
+              isDarkMode ? "text-gray-400" : "text-gray-600"
             } max-w-2xl mx-auto`}
           >
             Our team of highly qualified medical professionals is here to
@@ -120,9 +120,7 @@ const MeetOurExperts = () => {
             <div
               key={index}
               className={`group bg-white dark:bg-gray-800 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-2 ${
-                theme === "dark"
-                  ? "border border-gray-700"
-                  : "border border-gray-100"
+                isDarkMode ? "border border-gray-700" : "border border-gray-100"
               }`}
             >
               <div className="relative overflow-hidden">

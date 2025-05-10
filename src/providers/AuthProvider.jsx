@@ -54,6 +54,7 @@ const AuthProvider = ({ children }) => {
         .get(`/user/${user?.email}`)
         .then((res) => {
           setDbUser(res.data);
+          console.log("res.data", res.data);
           setLoader(false);
         })
         .catch((error) => {
@@ -110,6 +111,7 @@ const AuthProvider = ({ children }) => {
           .post("/user", {
             email: currentUser?.email || "demo user",
             displayName: currentUser?.displayName || "demo displayName",
+            dbPhoto: currentUser?.photoURL || "",
           })
           .then((res) => setResponse(res))
           .catch((err) => {

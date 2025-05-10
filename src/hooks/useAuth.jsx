@@ -16,6 +16,7 @@ const useAuth = () => {
     setDbUser,
     errorMessage,
     setErrorMessage,
+    signOutUser,
   } = useContext(AuthContexts);
   return {
     user,
@@ -32,6 +33,7 @@ const useAuth = () => {
     setDbUser,
     errorMessage,
     setErrorMessage,
+    signOutUser,
   };
 };
 

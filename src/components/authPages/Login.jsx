@@ -56,6 +56,8 @@ const Login = () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       setUser(result.user);
+      console.log("result.user", result.user);
+
       toast.success("Welcome! Google sign-in successful", {
         position: "top-right",
         autoClose: 3000,

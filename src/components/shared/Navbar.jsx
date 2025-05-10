@@ -22,7 +22,6 @@ import { BiMoney } from "react-icons/bi";
 
 import logo from "../../assets/logo.png";
 import { AuthContexts } from "../../providers/AuthProvider";
-import { LayoutDashboard } from "lucide-react";
 
 const Navbar = () => {
   const { user, signOutUser, theme, toggleTheme, isDarkMode } =
