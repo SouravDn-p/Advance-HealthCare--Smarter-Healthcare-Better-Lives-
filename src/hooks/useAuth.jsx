@@ -17,6 +17,7 @@ const useAuth = () => {
     errorMessage,
     setErrorMessage,
     signOutUser,
+    isDarkMode,
   } = useContext(AuthContexts);
   return {
     user,
@@ -34,6 +35,7 @@ const useAuth = () => {
     errorMessage,
     setErrorMessage,
     signOutUser,
+    isDarkMode,
   };
 };
 

@@ -26,14 +26,14 @@ import {
   Search,
   Menu,
   X,
-  BarChart2Icon,
 } from "lucide-react";
 import useAuth from "../hooks/useAuth";
 import AdminDashboard from "../components/dashboard/admin/dashboard/AdminDashboard";
 import DoctorDashboard from "../components/dashboard/doctors/dashboard/DoctorDashboard";
+import healthTips from "../assets/logo/logo.png";
 
 const Dashboard = () => {
-  const { user, theme, dbUser } = useAuth();
+  const { user, dbUser, isDarkMode } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState([
@@ -181,6 +181,20 @@ const Dashboard = () => {
     },
   ];
 
+  // Utility functions for classNames
+  const getCardClasses = () =>
+    `rounded-xl shadow-sm border p-4 transition-shadow duration-200 ${
+      isDarkMode
+        ? "bg-gray-800 border-gray-700 hover:shadow-md"
+        : "bg-white border-gray-200 hover:shadow-md"
+    }`;
+
+  const getTextColor = (baseColor = "gray") =>
+    isDarkMode ? `text-${baseColor}-100` : `text-${baseColor}-900`;
+
+  const getSecondaryTextColor = () =>
+    isDarkMode ? "text-gray-400" : "text-gray-600";
+
   // Mark notification as read
   const markAsRead = (id) => {
     setNotifications(
@@ -252,16 +266,45 @@ const Dashboard = () => {
   return (
     <div
       className={`min-h-screen ${
-        theme === "dark"
-          ? "bg-gray-900 text-gray-100"
-          : "bg-gray-50 text-gray-900"
+        isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
       } transition-colors duration-300`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Mobile Menu Toggle */}
+        <div className="md:hidden flex justify-between items-center mb-6">
+          <h1
+            className={`text-2xl font-bold ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}
+          >
+            Dashboard
+          </h1>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+            ) : (
+              <Menu className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+            )}
+          </button>
+        </div>
+
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white dark:bg-gray-800 rounded-lg shadow-md mb-6 p-4">
-            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-200 dark:border-gray-700">
+          <div
+            className={`md:hidden rounded-xl shadow-md mb-6 p-4 ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200"
+            }`}
+          >
+            <div
+              className={`flex items-center gap-3 mb-4 pb-4 border-b ${
+                isDarkMode ? "border-gray-700" : "border-gray-200"
+              }`}
+            >
               <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
                 {user?.name ? (
                   user.name.charAt(0)
@@ -270,121 +313,72 @@ const Dashboard = () => {
                 )}
               </div>
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">
+                <p className={`font-medium ${getTextColor()}`}>
                   {user?.name || "Guest User"}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className={`text-xs ${getSecondaryTextColor()}`}>
                   Patient ID: {user?.id || "12345678"}
                 </p>
               </div>
             </div>
             <nav className="space-y-2">
-              <button
-                onClick={() => {
-                  setActiveTab("overview");
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`w-full text-left px-4 py-2 rounded-lg flex items-center gap-3 ${
-                  activeTab === "overview"
-                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                    : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                }`}
-              >
-                <Activity className="w-5 h-5" />
-                Overview
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab("appointments");
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`w-full text-left px-4 py-2 rounded-lg flex items-center gap-3 ${
-                  activeTab === "appointments"
-                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                    : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                }`}
-              >
-                <Calendar className="w-5 h-5" />
-                Appointments
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab("records");
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`w-full text-left px-4 py-2 rounded-lg flex items-center gap-3 ${
-                  activeTab === "records"
-                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                    : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                }`}
-              >
-                <FileText className="w-5 h-5" />
-                Medical Records
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab("medications");
-                  setIsMobileMenuOpen(false);
-                }}
-                className={`w-full text-left px-4 py-2 rounded-lg flex items-center gap-3 ${
-                  activeTab === "medications"
-                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                    : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
-                }`}
-              >
-                <Pill className="w-5 h-5" />
-                Medications
-              </button>
+              {["overview", "appointments", "records", "medications"].map(
+                (tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => {
+                      setActiveTab(tab);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 rounded-lg flex items-center gap-3 ${
+                      activeTab === tab
+                        ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                        : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    }`}
+                  >
+                    {tab === "overview" && <Activity className="w-5 h-5" />}
+                    {tab === "appointments" && <Calendar className="w-5 h-5" />}
+                    {tab === "records" && <FileText className="w-5 h-5" />}
+                    {tab === "medications" && <Pill className="w-5 h-5" />}
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                )
+              )}
             </nav>
           </div>
         )}
 
         {/* Dashboard Tabs - Desktop */}
-        <div className="hidden md:flex space-x-1 p-1 bg-gray-100 dark:bg-gray-800 rounded-lg mb-6">
-          <button
-            onClick={() => setActiveTab("overview")}
-            className={`px-4 py-2 rounded-md text-sm font-medium ${
-              activeTab === "overview"
-                ? "bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400"
-                : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
-            } transition-colors duration-200 flex items-center`}
-          >
-            <Activity className="w-4 h-4 mr-2" />
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveTab("appointments")}
-            className={`px-4 py-2 rounded-md text-sm font-medium ${
-              activeTab === "appointments"
-                ? "bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400"
-                : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
-            } transition-colors duration-200 flex items-center`}
-          >
-            <Calendar className="w-4 h-4 mr-2" />
-            Appointments
-          </button>
-          <button
-            onClick={() => setActiveTab("records")}
-            className={`px-4 py-2 rounded-md text-sm font-medium ${
-              activeTab === "records"
-                ? "bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400"
-                : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
-            } transition-colors duration-200 flex items-center`}
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            Medical Records
-          </button>
-          <button
-            onClick={() => setActiveTab("medications")}
-            className={`px-4 py-2 rounded-md text-sm font-medium ${
-              activeTab === "medications"
-                ? "bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-blue-400"
-                : "text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100"
-            } transition-colors duration-200 flex items-center`}
-          >
-            <Pill className="w-4 h-4 mr-2" />
-            Medications
-          </button>
+        <div
+          className={`hidden md:flex space-x-1 p-1 rounded-lg mb-6 ${
+            isDarkMode ? "bg-gray-800" : "bg-gray-100"
+          }`}
+        >
+          {["overview", "appointments", "records", "medications"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 rounded-md text-sm font-medium flex items-center ${
+                activeTab === tab
+                  ? `${
+                      isDarkMode
+                        ? "bg-gray-700 text-blue-400"
+                        : "bg-white text-blue-600"
+                    } shadow-sm`
+                  : `${
+                      isDarkMode
+                        ? "text-gray-300 hover:text-gray-100"
+                        : "text-gray-600 hover:text-gray-800"
+                    }`
+              } transition-colors duration-200`}
+            >
+              {tab === "overview" && <Activity className="w-4 h-4 mr-2" />}
+              {tab === "appointments" && <Calendar className="w-4 h-4 mr-2" />}
+              {tab === "records" && <FileText className="w-4 h-4 mr-2" />}
+              {tab === "medications" && <Pill className="w-4 h-4 mr-2" />}
+              {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            </button>
+          ))}
         </div>
 
         {/* Dashboard Content */}
@@ -392,79 +386,67 @@ const Dashboard = () => {
           <div>
             {/* Quick Actions */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow duration-200">
-                <div className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-full mb-3">
-                    <Stethoscope className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              {[
+                {
+                  icon: Stethoscope,
+                  title: "Find Doctor",
+                  desc: "Search specialists",
+                  action: "Search",
+                  bg: "blue",
+                },
+                {
+                  icon: Calendar,
+                  title: "Book Appointment",
+                  desc: "Schedule a visit",
+                  action: "Book Now",
+                  bg: "green",
+                },
+                {
+                  icon: Brain,
+                  title: "AI Diagnosis",
+                  desc: "Check symptoms",
+                  action: "Start",
+                  bg: "purple",
+                },
+                {
+                  icon: Ambulance,
+                  title: "Emergency",
+                  desc: "Find nearby help",
+                  action: "Locate",
+                  bg: "red",
+                },
+              ].map((action, index) => (
+                <div key={index} className={getCardClasses()}>
+                  <div className="flex flex-col items-center text-center">
+                    <div
+                      className={`p-3 rounded-full mb-3 ${
+                        isDarkMode
+                          ? `bg-${action.bg}-900/30`
+                          : `bg-${action.bg}-100`
+                      }`}
+                    >
+                      <action.icon
+                        className={`w-6 h-6 text-${action.bg}-600 dark:text-${action.bg}-400`}
+                      />
+                    </div>
+                    <h3 className={`font-medium ${getTextColor()} mb-1`}>
+                      {action.title}
+                    </h3>
+                    <p className={`text-xs ${getSecondaryTextColor()} mb-3`}>
+                      {action.desc}
+                    </p>
+                    <button className="mt-auto text-blue-600 dark:text-blue-400 text-sm hover:underline">
+                      {action.action}
+                    </button>
                   </div>
-                  <h3 className="font-medium text-gray-900 dark:text-white mb-1">
-                    Find Doctor
-                  </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                    Search specialists
-                  </p>
-                  <button className="mt-auto text-blue-600 dark:text-blue-400 text-sm hover:underline">
-                    Search
-                  </button>
                 </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow duration-200">
-                <div className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-full mb-3">
-                    <Calendar className="w-6 h-6 text-green-600 dark:text-green-400" />
-                  </div>
-                  <h3 className="font-medium text-gray-900 dark:text-white mb-1">
-                    Book Appointment
-                  </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                    Schedule a visit
-                  </p>
-                  <button className="mt-auto text-blue-600 dark:text-blue-400 text-sm hover:underline">
-                    Book Now
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow duration-200">
-                <div className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-full mb-3">
-                    <Brain className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <h3 className="font-medium text-gray-900 dark:text-white mb-1">
-                    AI Diagnosis
-                  </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                    Check symptoms
-                  </p>
-                  <button className="mt-auto text-blue-600 dark:text-blue-400 text-sm hover:underline">
-                    Start
-                  </button>
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow duration-200">
-                <div className="flex flex-col items-center text-center">
-                  <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-full mb-3">
-                    <Ambulance className="w-6 h-6 text-red-600 dark:text-red-400" />
-                  </div>
-                  <h3 className="font-medium text-gray-900 dark:text-white mb-1">
-                    Emergency
-                  </h3>
-                  <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
-                    Find nearby help
-                  </p>
-                  <button className="mt-auto text-blue-600 dark:text-blue-400 text-sm hover:underline">
-                    Locate
-                  </button>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Health Metrics */}
             <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className={`text-xl font-semibold ${getTextColor()}`}>
                   Health Metrics
                 </h2>
                 <button className="text-blue-600 dark:text-blue-400 text-sm hover:underline flex items-center">
@@ -473,199 +455,153 @@ const Dashboard = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center">
-                      <Heart className="w-5 h-5 text-red-500 mr-2" />
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        Blood Pressure
-                      </h3>
-                    </div>
-                    {getTrendIndicator(
-                      healthMetrics.bloodPressure[
-                        healthMetrics.bloodPressure.length - 1
-                      ].systolic,
-                      healthMetrics.bloodPressure[
-                        healthMetrics.bloodPressure.length - 2
-                      ].systolic
-                    )}
-                  </div>
-                  <div className="flex items-end gap-2">
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {
-                        healthMetrics.bloodPressure[
-                          healthMetrics.bloodPressure.length - 1
-                        ].systolic
-                      }
-                      /
-                      {
-                        healthMetrics.bloodPressure[
-                          healthMetrics.bloodPressure.length - 1
-                        ].diastolic
-                      }
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      mmHg
-                    </div>
-                  </div>
-                  <div className="mt-4 h-12 flex items-end">
-                    {healthMetrics.bloodPressure.map((reading, index) => (
-                      <div
-                        key={index}
-                        className="flex-1 flex flex-col items-center"
-                      >
-                        <div className="w-full flex justify-center space-x-1">
+                {[
+                  {
+                    title: "Blood Pressure",
+                    icon: Heart,
+                    color: "red",
+                    data: healthMetrics.bloodPressure,
+                    unit: "mmHg",
+                    render: (data) =>
+                      `${data[data.length - 1].systolic}/${
+                        data[data.length - 1].diastolic
+                      }`,
+                    trend: (data) =>
+                      getTrendIndicator(
+                        data[data.length - 1].systolic,
+                        data[data.length - 2].systolic
+                      ),
+                    chart: (data) =>
+                      data.map((reading, index) => (
+                        <div
+                          key={index}
+                          className="flex-1 flex flex-col items-center"
+                        >
+                          <div className="w-full flex justify-center space-x-1">
+                            <div
+                              className="w-1 bg-red-400 dark:bg-red-500 rounded-t"
+                              style={{ height: `${reading.systolic / 10}px` }}
+                            ></div>
+                            <div
+                              className="w-1 bg-blue-400 dark:bg-blue-500 rounded-t"
+                              style={{ height: `${reading.diastolic / 10}px` }}
+                            ></div>
+                          </div>
+                        </div>
+                      )),
+                  },
+                  {
+                    title: "Heart Rate",
+                    icon: Activity,
+                    color: "green",
+                    data: healthMetrics.heartRate,
+                    unit: "bpm",
+                    render: (data) => `${data[data.length - 1].value}`,
+                    trend: (data) =>
+                      getTrendIndicator(
+                        data[data.length - 1].value,
+                        data[data.length - 2].value
+                      ),
+                    chart: (data) =>
+                      data.map((reading, index) => (
+                        <div
+                          key={index}
+                          className="flex-1 flex flex-col items-center"
+                        >
                           <div
-                            className="w-1 bg-red-400 dark:bg-red-500 rounded-t"
-                            style={{ height: `${reading.systolic / 10}px` }}
-                          ></div>
-                          <div
-                            className="w-1 bg-blue-400 dark:bg-blue-500 rounded-t"
-                            style={{ height: `${reading.diastolic / 10}px` }}
+                            className="w-2 bg-green-400 dark:bg-green-500 rounded-t"
+                            style={{ height: `${reading.value / 6}px` }}
                           ></div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center">
-                      <Activity className="w-5 h-5 text-green-500 mr-2" />
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        Heart Rate
-                      </h3>
-                    </div>
-                    {getTrendIndicator(
-                      healthMetrics.heartRate[
-                        healthMetrics.heartRate.length - 1
-                      ].value,
-                      healthMetrics.heartRate[
-                        healthMetrics.heartRate.length - 2
-                      ].value
-                    )}
-                  </div>
-                  <div className="flex items-end gap-2">
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {
-                        healthMetrics.heartRate[
-                          healthMetrics.heartRate.length - 1
-                        ].value
-                      }
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      bpm
-                    </div>
-                  </div>
-                  <div className="mt-4 h-12 flex items-end">
-                    {healthMetrics.heartRate.map((reading, index) => (
-                      <div
-                        key={index}
-                        className="flex-1 flex flex-col items-center"
-                      >
+                      )),
+                  },
+                  {
+                    title: "Weight",
+                    icon: BarChart2,
+                    color: "blue",
+                    data: healthMetrics.weight,
+                    unit: "lbs",
+                    render: (data) => `${data[data.length - 1].value}`,
+                    trend: (data) =>
+                      getTrendIndicator(
+                        data[data.length - 1].value,
+                        data[data.length - 2].value
+                      ),
+                    chart: (data) =>
+                      data.map((reading, index) => (
                         <div
-                          className="w-2 bg-green-400 dark:bg-green-500 rounded-t"
-                          style={{ height: `${reading.value / 6}px` }}
-                        ></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center">
-                      <BarChart2Icon className="w-5 h-5 text-blue-500 mr-2" />
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        Weight
-                      </h3>
-                    </div>
-                    {getTrendIndicator(
-                      healthMetrics.weight[healthMetrics.weight.length - 1]
-                        .value,
-                      healthMetrics.weight[healthMetrics.weight.length - 2]
-                        .value
-                    )}
-                  </div>
-                  <div className="flex items-end gap-2">
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {
-                        healthMetrics.weight[healthMetrics.weight.length - 1]
-                          .value
-                      }
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      lbs
-                    </div>
-                  </div>
-                  <div className="mt-4 h-12 flex items-end">
-                    {healthMetrics.weight.map((reading, index) => (
-                      <div
-                        key={index}
-                        className="flex-1 flex flex-col items-center"
-                      >
+                          key={index}
+                          className="flex-1 flex flex-col items-center"
+                        >
+                          <div
+                            className="w-2 bg-blue-400 dark:bg-blue-500 rounded-t"
+                            style={{ height: `${(reading.value - 150) / 2}px` }}
+                          ></div>
+                        </div>
+                      )),
+                  },
+                  {
+                    title: "Blood Sugar",
+                    icon: Droplet,
+                    color: "purple",
+                    data: healthMetrics.bloodSugar,
+                    unit: "mg/dL",
+                    render: (data) => `${data[data.length - 1].value}`,
+                    trend: (data) =>
+                      getTrendIndicator(
+                        data[data.length - 1].value,
+                        data[data.length - 2].value
+                      ),
+                    chart: (data) =>
+                      data.map((reading, index) => (
                         <div
-                          className="w-2 bg-blue-400 dark:bg-blue-500 rounded-t"
-                          style={{ height: `${(reading.value - 150) / 2}px` }}
-                        ></div>
+                          key={index}
+                          className="flex-1 flex flex-col items-center"
+                        >
+                          <div
+                            className="w-2 bg-purple-400 dark:bg-purple-500 rounded-t"
+                            style={{ height: `${reading.value / 8}px` }}
+                          ></div>
+                        </div>
+                      )),
+                  },
+                ].map((metric, index) => (
+                  <div key={index} className={getCardClasses()}>
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center">
+                        <metric.icon
+                          className={`w-5 h-5 text-${metric.color}-500 mr-2`}
+                        />
+                        <h3 className={`font-medium ${getTextColor()}`}>
+                          {metric.title}
+                        </h3>
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center">
-                      <Droplet className="w-5 h-5 text-purple-500 mr-2" />
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        Blood Sugar
-                      </h3>
+                      {metric.trend(metric.data)}
                     </div>
-                    {getTrendIndicator(
-                      healthMetrics.bloodSugar[
-                        healthMetrics.bloodSugar.length - 1
-                      ].value,
-                      healthMetrics.bloodSugar[
-                        healthMetrics.bloodSugar.length - 2
-                      ].value
-                    )}
-                  </div>
-                  <div className="flex items-end gap-2">
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {
-                        healthMetrics.bloodSugar[
-                          healthMetrics.bloodSugar.length - 1
-                        ].value
-                      }
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">
-                      mg/dL
-                    </div>
-                  </div>
-                  <div className="mt-4 h-12 flex items-end">
-                    {healthMetrics.bloodSugar.map((reading, index) => (
+                    <div className="flex items-end gap-2">
+                      <div className={`text-2xl font-bold ${getTextColor()}`}>
+                        {metric.render(metric.data)}
+                      </div>
                       <div
-                        key={index}
-                        className="flex-1 flex flex-col items-center"
+                        className={`text-sm ${getSecondaryTextColor()} mb-1`}
                       >
-                        <div
-                          className="w-2 bg-purple-400 dark:bg-purple-500 rounded-t"
-                          style={{ height: `${reading.value / 8}px` }}
-                        ></div>
+                        {metric.unit}
                       </div>
-                    ))}
+                    </div>
+                    <div className="mt-4 h-12 flex items-end">
+                      {metric.chart(metric.data)}
+                    </div>
                   </div>
-                </div>
+                ))}
               </div>
             </div>
 
             {/* Upcoming Appointments and Notifications */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
               {/* Upcoming Appointments */}
-              <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <div className={`lg:col-span-2 ${getCardClasses()}`}>
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  <h2 className={`text-xl font-semibold ${getTextColor()}`}>
                     Upcoming Appointments
                   </h2>
                   <button className="text-blue-600 dark:text-blue-400 text-sm hover:underline flex items-center">
@@ -682,13 +618,15 @@ const Dashboard = () => {
                       >
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-medium text-gray-900 dark:text-white">
+                            <h3 className={`font-medium ${getTextColor()}`}>
                               {appointment.doctorName}
                             </h3>
                             <p className="text-sm text-blue-600 dark:text-blue-400">
                               {appointment.specialty}
                             </p>
-                            <div className="flex items-center mt-2 text-sm text-gray-600 dark:text-gray-400">
+                            <div
+                              className={`flex items-center mt-2 text-sm ${getSecondaryTextColor()}`}
+                            >
                               <Calendar className="w-4 h-4 mr-1" />
                               <span>{formatDate(appointment.date)}</span>
                               <span className="mx-2">•</span>
@@ -697,10 +635,18 @@ const Dashboard = () => {
                             </div>
                           </div>
                           <div className="flex flex-col items-end">
-                            <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-full text-xs font-medium">
+                            <span
+                              className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                isDarkMode
+                                  ? "bg-blue-900/30 text-blue-300"
+                                  : "bg-blue-100 text-blue-800"
+                              }`}
+                            >
                               {getDaysUntil(appointment.date)}
                             </span>
-                            <span className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                            <span
+                              className={`mt-2 text-sm ${getSecondaryTextColor()}`}
+                            >
                               {appointment.location}
                             </span>
                           </div>
@@ -715,8 +661,10 @@ const Dashboard = () => {
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <Calendar
+                      className={`w-12 h-12 ${getSecondaryTextColor()}`}
+                    />
+                    <p className={getSecondaryTextColor()}>
                       No upcoming appointments
                     </p>
                     <button className="mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm">
@@ -727,9 +675,9 @@ const Dashboard = () => {
               </div>
 
               {/* Notifications */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+              <div className={getCardClasses()}>
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  <h2 className={`text-xl font-semibold ${getTextColor()}`}>
                     Notifications
                   </h2>
                   <button className="text-blue-600 dark:text-blue-400 text-sm hover:underline">
@@ -744,9 +692,13 @@ const Dashboard = () => {
                         key={notification.id}
                         className={`p-3 rounded-lg ${
                           notification.read
-                            ? "bg-gray-50 dark:bg-gray-700/30"
-                            : "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 dark:border-blue-400"
-                        }`}
+                            ? isDarkMode
+                              ? "bg-gray-700/30"
+                              : "bg-gray-50"
+                            : isDarkMode
+                            ? "bg-blue-900/20 border-blue-400"
+                            : "bg-gray-50 border-blue-500"
+                        } border-l-4`}
                       >
                         <div className="flex items-start gap-3">
                           <div className="flex-shrink-0">
@@ -756,8 +708,10 @@ const Dashboard = () => {
                             <h3
                               className={`font-medium ${
                                 notification.read
-                                  ? "text-gray-900 dark:text-white"
-                                  : "text-blue-800 dark:text-blue-300"
+                                  ? getTextColor()
+                                  : isDarkMode
+                                  ? "text-blue-300"
+                                  : "text-blue-800"
                               }`}
                             >
                               {notification.title}
@@ -765,14 +719,18 @@ const Dashboard = () => {
                             <p
                               className={`text-sm ${
                                 notification.read
-                                  ? "text-gray-600 dark:text-gray-400"
-                                  : "text-blue-700 dark:text-blue-300"
+                                  ? getSecondaryTextColor()
+                                  : isDarkMode
+                                  ? "text-blue-300"
+                                  : "text-blue-700"
                               }`}
                             >
                               {notification.message}
                             </p>
                             <div className="flex justify-between items-center mt-2">
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                              <span
+                                className={`text-xs ${getSecondaryTextColor()}`}
+                              >
                                 {notification.time} ago
                               </span>
                               {!notification.read && (
@@ -791,8 +749,8 @@ const Dashboard = () => {
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <Bell className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-600 dark:text-gray-400">
+                    <Bell className={`w-12 h-12 ${getSecondaryTextColor()}`} />
+                    <p className={getSecondaryTextColor()}>
                       No new notifications
                     </p>
                   </div>
@@ -803,7 +761,7 @@ const Dashboard = () => {
             {/* Recent Medical Records */}
             <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 className={`text-xl font-semibold ${getTextColor()}`}>
                   Recent Medical Records
                 </h2>
                 <button className="text-blue-600 dark:text-blue-400 text-sm hover:underline flex items-center">
@@ -811,44 +769,43 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div
+                className={`rounded-xl shadow-sm border overflow-hidden ${
+                  isDarkMode
+                    ? "bg-gray-800 border-gray-700"
+                    : "bg-white border-gray-200"
+                }`}
+              >
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead className="bg-gray-50 dark:bg-gray-700">
+                  <table
+                    className={`min-w-full divide-y ${
+                      isDarkMode ? "divide-gray-700" : "divide-gray-200"
+                    }`}
+                  >
+                    <thead
+                      className={isDarkMode ? "bg-gray-700" : "bg-gray-50"}
+                    >
                       <tr>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                        >
-                          Type
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                        >
-                          Title
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                        >
-                          Date
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                        >
-                          Provider
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                        >
-                          Action
-                        </th>
+                        {["Type", "Title", "Date", "Provider", "Action"].map(
+                          (header) => (
+                            <th
+                              key={header}
+                              scope="col"
+                              className={`px-6 py-3 text-left text-xs font-medium uppercase tracking-wider ${
+                                isDarkMode ? "text-gray-400" : "text-gray-500"
+                              }`}
+                            >
+                              {header}
+                            </th>
+                          )
+                        )}
                       </tr>
                     </thead>
-                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody
+                      className={`divide-y ${
+                        isDarkMode ? "divide-gray-700" : "divide-gray-200"
+                      } ${isDarkMode ? "bg-gray-800" : "bg-white"}`}
+                    >
                       {recentMedicalRecords.map((record) => (
                         <tr
                           key={record.id}
@@ -856,21 +813,36 @@ const Dashboard = () => {
                         >
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span
-                              className="px-2 py-1 text-xs font-medium rounded-full capitalize
-                              ${record.type === 'test' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400' : 
-                                record.type === 'visit' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' : 
-                                'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'}"
+                              className={`px-2 py-1 text-xs font-medium rounded-full capitalize ${
+                                record.type === "test"
+                                  ? isDarkMode
+                                    ? "bg-purple-900/30 text-purple-400"
+                                    : "bg-purple-100 text-purple-800"
+                                  : record.type === "visit"
+                                  ? isDarkMode
+                                    ? "bg-blue-900/30 text-blue-400"
+                                    : "bg-blue-100 text-blue-800"
+                                  : isDarkMode
+                                  ? "bg-green-900/30 text-green-400"
+                                  : "bg-green-100 text-green-800"
+                              }`}
                             >
                               {record.type}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                          <td
+                            className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${getTextColor()}`}
+                          >
                             {record.title}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                          <td
+                            className={`px-6 py-4 whitespace-nowrap text-sm ${getSecondaryTextColor()}`}
+                          >
                             {formatDate(record.date)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                          <td
+                            className={`px-6 py-4 whitespace-nowrap text-sm ${getSecondaryTextColor()}`}
+                          >
                             {record.doctor}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600 dark:text-blue-400">
@@ -885,20 +857,32 @@ const Dashboard = () => {
             </div>
 
             {/* Health Tips */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-xl p-6 border border-blue-100 dark:border-blue-800">
+            <div
+              className={`rounded-xl p-6 border ${
+                isDarkMode
+                  ? "bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border-blue-800"
+                  : "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-100"
+              }`}
+            >
               <div className="flex flex-col md:flex-row items-center gap-6">
                 <div className="md:w-1/4 flex justify-center">
                   <img
-                    src="/placeholder.svg?height=200&width=200"
+                    src={healthTips}
                     alt="Health Tips"
-                    className="w-32 h-32 object-cover"
+                    className="w-32 h-32 object-contain"
                   />
                 </div>
                 <div className="md:w-3/4">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h2
+                    className={`text-xl font-semibold ${getTextColor()} mb-2`}
+                  >
                     Health Tip of the Day
                   </h2>
-                  <p className="text-gray-700 dark:text-gray-300 mb-4">
+                  <p
+                    className={`${
+                      isDarkMode ? "text-gray-300" : "text-gray-700"
+                    } mb-4`}
+                  >
                     Regular physical activity can help reduce your risk of
                     chronic diseases, improve your balance and coordination,
                     help you lose weight, and even improve your sleep habits and
@@ -917,7 +901,7 @@ const Dashboard = () => {
         {activeTab === "appointments" && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h2 className={`text-xl font-semibold ${getTextColor()}`}>
                 My Appointments
               </h2>
               <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2">
@@ -926,18 +910,33 @@ const Dashboard = () => {
               </button>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
+            <div className={getCardClasses()}>
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                <div className="flex space-x-1 p-1 rounded-lg bg-gray-100 dark:bg-gray-700">
-                  <button className="px-4 py-2 rounded-md text-sm font-medium bg-white dark:bg-gray-600 shadow-sm text-blue-600 dark:text-blue-400">
-                    Upcoming
-                  </button>
-                  <button className="px-4 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100">
-                    Past
-                  </button>
-                  <button className="px-4 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100">
-                    Cancelled
-                  </button>
+                <div
+                  className={`flex space-x-1 p-1 rounded-lg ${
+                    isDarkMode ? "bg-gray-700" : "bg-gray-100"
+                  }`}
+                >
+                  {["Upcoming", "Past", "Cancelled"].map((status) => (
+                    <button
+                      key={status}
+                      className={`px-4 py-2 rounded-md text-sm font-medium ${
+                        status === "Upcoming"
+                          ? `${
+                              isDarkMode
+                                ? "bg-gray-600 text-blue-400"
+                                : "bg-white text-blue-600"
+                            } shadow-sm`
+                          : `${
+                              isDarkMode
+                                ? "text-gray-300 hover:text-gray-100"
+                                : "text-gray-600 hover:text-gray-800"
+                            }`
+                      }`}
+                    >
+                      {status}
+                    </button>
+                  ))}
                 </div>
 
                 <div className="relative w-full md:w-64">
@@ -947,7 +946,11 @@ const Dashboard = () => {
                   <input
                     type="text"
                     placeholder="Search appointments"
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm"
+                    className={`block w-full pl-10 pr-3 py-2 border rounded-md leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm ${
+                      isDarkMode
+                        ? "border-gray-600 bg-gray-700 text-white dark:focus:ring-blue-400 dark:focus:border-blue-400 placeholder-gray-400"
+                        : "border-gray-300 bg-white text-gray-900 focus:border-blue-500 placeholder-gray-500"
+                    }`}
                   />
                 </div>
               </div>
@@ -961,11 +964,19 @@ const Dashboard = () => {
                     >
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                            <Stethoscope className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                          <div
+                            className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                              isDarkMode ? "bg-blue-900/30" : "bg-blue-100"
+                            }`}
+                          >
+                            <Stethoscope
+                              className={`w-6 h-6 ${
+                                isDarkMode ? "text-blue-400" : "text-blue-600"
+                              }`}
+                            />
                           </div>
                           <div>
-                            <h3 className="font-medium text-gray-900 dark:text-white">
+                            <h3 className={`font-medium ${getTextColor()}`}>
                               {appointment.doctorName}
                             </h3>
                             <p className="text-sm text-blue-600 dark:text-blue-400">
@@ -976,28 +987,34 @@ const Dashboard = () => {
 
                         <div className="flex items-center gap-4">
                           <div className="text-center">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className={`text-sm ${getSecondaryTextColor()}`}>
                               Date
                             </p>
-                            <p className="font-medium text-gray-900 dark:text-white flex items-center">
+                            <p
+                              className={`font-medium ${getTextColor()} flex items-center`}
+                            >
                               <Calendar className="w-4 h-4 mr-1" />
                               {formatDate(appointment.date)}
                             </p>
                           </div>
                           <div className="text-center">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className={`text-sm ${getSecondaryTextColor()}`}>
                               Time
                             </p>
-                            <p className="font-medium text-gray-900 dark:text-white flex items-center">
+                            <p
+                              className={`font-medium ${getTextColor()} flex items-center`}
+                            >
                               <Clock className="w-4 h-4 mr-1" />
                               {appointment.time}
                             </p>
                           </div>
                           <div className="text-center">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className={`text-sm ${getSecondaryTextColor()}`}>
                               Type
                             </p>
-                            <p className="font-medium text-gray-900 dark:text-white capitalize">
+                            <p
+                              className={`font-medium ${getTextColor()} capitalize`}
+                            >
                               {appointment.type}
                             </p>
                           </div>
@@ -1017,11 +1034,15 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  <Calendar
+                    className={`w-16 h-16 ${getSecondaryTextColor()}`}
+                  />
+                  <h3 className={`text-lg font-medium ${getTextColor()} mb-2`}>
                     No appointments found
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
+                  <p
+                    className={`max-w-md mx-auto mb-6 ${getSecondaryTextColor()}`}
+                  >
                     You don't have any upcoming appointments. Book a new
                     appointment to get started.
                   </p>
@@ -1037,7 +1058,7 @@ const Dashboard = () => {
         {activeTab === "records" && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h2 className={`text-xl font-semibold ${getTextColor()}`}>
                 Medical Records
               </h2>
               <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2">
@@ -1046,21 +1067,38 @@ const Dashboard = () => {
               </button>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
+            <div className={getCardClasses()}>
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
-                <div className="flex space-x-1 p-1 rounded-lg bg-gray-100 dark:bg-gray-700 overflow-x-auto">
-                  <button className="px-4 py-2 rounded-md text-sm font-medium bg-white dark:bg-gray-600 shadow-sm text-blue-600 dark:text-blue-400 whitespace-nowrap">
-                    All Records
-                  </button>
-                  <button className="px-4 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 whitespace-nowrap">
-                    Test Results
-                  </button>
-                  <button className="px-4 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 whitespace-nowrap">
-                    Visits
-                  </button>
-                  <button className="px-4 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 whitespace-nowrap">
-                    Prescriptions
-                  </button>
+                <div
+                  className={`flex space-x-1 p-1 rounded-lg overflow-x-auto ${
+                    isDarkMode ? "bg-gray-700" : "bg-gray-100"
+                  }`}
+                >
+                  {[
+                    "All Records",
+                    "Test Results",
+                    "Visits",
+                    "Prescriptions",
+                  ].map((filter) => (
+                    <button
+                      key={filter}
+                      className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap ${
+                        filter === "All Records"
+                          ? `${
+                              isDarkMode
+                                ? "bg-gray-600 text-blue-400"
+                                : "bg-white text-blue-600"
+                            } shadow-sm`
+                          : `${
+                              isDarkMode
+                                ? "text-gray-300 hover:text-gray-100"
+                                : "text-gray-600 hover:text-gray-800"
+                            }`
+                      }`}
+                    >
+                      {filter}
+                    </button>
+                  ))}
                 </div>
 
                 <div className="relative w-full md:w-64">
@@ -1070,7 +1108,11 @@ const Dashboard = () => {
                   <input
                     type="text"
                     placeholder="Search records"
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm"
+                    className={`block w-full pl-10 pr-3 py-2 border rounded-md leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm ${
+                      isDarkMode
+                        ? "border-gray-600 bg-gray-700 text-white dark:focus:ring-blue-400 dark:focus:border-blue-400 placeholder-gray-400"
+                        : "border-gray-300 bg-white text-gray-900 focus:border-blue-500 placeholder-gray-500"
+                    }`}
                   />
                 </div>
               </div>
@@ -1085,36 +1127,49 @@ const Dashboard = () => {
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="flex items-center gap-4">
                           <div
-                            className={`w-12 h-12 rounded-full flex items-center justify-center
-                            ${
+                            className={`w-12 h-12 rounded-full flex items-center justify-center ${
                               record.type === "test"
-                                ? "bg-purple-100 dark:bg-purple-900/30"
+                                ? isDarkMode
+                                  ? "bg-purple-900/30"
+                                  : "bg-purple-100"
                                 : record.type === "visit"
-                                ? "bg-blue-100 dark:bg-blue-900/30"
-                                : "bg-green-100 dark:bg-green-900/30"
+                                ? isDarkMode
+                                  ? "bg-blue-900/30"
+                                  : "bg-blue-100"
+                                : isDarkMode
+                                ? "bg-green-900/30"
+                                : "bg-green-100"
                             }`}
                           >
                             {record.type === "test" ? (
                               <Clipboard
                                 className={`w-6 h-6 ${
-                                  record.type === "test"
-                                    ? "text-purple-600 dark:text-purple-400"
-                                    : record.type === "visit"
-                                    ? "text-blue-600 dark:text-blue-400"
-                                    : "text-green-600 dark:text-green-400"
+                                  isDarkMode
+                                    ? "text-purple-400"
+                                    : "text-purple-600"
                                 }`}
                               />
                             ) : record.type === "visit" ? (
-                              <Stethoscope className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                              <Stethoscope
+                                className={`w-6 h-6 ${
+                                  isDarkMode ? "text-blue-400" : "text-blue-600"
+                                }`}
+                              />
                             ) : (
-                              <Pill className="w-6 h-6 text-green-600 dark:text-green-400" />
+                              <Pill
+                                className={`w-6 h-6 ${
+                                  isDarkMode
+                                    ? "text-green-400"
+                                    : "text-green-600"
+                                }`}
+                              />
                             )}
                           </div>
                           <div>
-                            <h3 className="font-medium text-gray-900 dark:text-white">
+                            <h3 className={`font-medium ${getTextColor()}`}>
                               {record.title}
                             </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className={`text-sm ${getSecondaryTextColor()}`}>
                               {record.facility}
                             </p>
                           </div>
@@ -1122,27 +1177,31 @@ const Dashboard = () => {
 
                         <div className="flex items-center gap-4">
                           <div className="text-center">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className={`text-sm ${getSecondaryTextColor()}`}>
                               Date
                             </p>
-                            <p className="font-medium text-gray-900 dark:text-white flex items-center">
+                            <p
+                              className={`font-medium ${getTextColor()} flex items-center`}
+                            >
                               <Calendar className="w-4 h-4 mr-1" />
                               {formatDate(record.date)}
                             </p>
                           </div>
                           <div className="text-center">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className={`text-sm ${getSecondaryTextColor()}`}>
                               Provider
                             </p>
-                            <p className="font-medium text-gray-900 dark:text-white">
+                            <p className={`font-medium ${getTextColor()}`}>
                               {record.doctor}
                             </p>
                           </div>
                           <div className="text-center">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className={`text-sm ${getSecondaryTextColor()}`}>
                               Type
                             </p>
-                            <p className="font-medium text-gray-900 dark:text-white capitalize">
+                            <p
+                              className={`font-medium ${getTextColor()} capitalize`}
+                            >
                               {record.type}
                             </p>
                           </div>
@@ -1152,7 +1211,13 @@ const Dashboard = () => {
                           <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm">
                             View
                           </button>
-                          <button className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 text-sm">
+                          <button
+                            className={`px-3 py-1 rounded-lg transition-colors duration-200 text-sm ${
+                              isDarkMode
+                                ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                            }`}
+                          >
                             Download
                           </button>
                         </div>
@@ -1162,11 +1227,15 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  <FileText
+                    className={`w-16 h-16 ${getSecondaryTextColor()}`}
+                  />
+                  <h3 className={`text-lg font-medium ${getTextColor()} mb-2`}>
                     No records found
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
+                  <p
+                    className={`max-w-md mx-auto mb-6 ${getSecondaryTextColor()}`}
+                  >
                     You don't have any medical records yet. Upload a record or
                     visit a doctor to get started.
                   </p>
@@ -1182,7 +1251,7 @@ const Dashboard = () => {
         {activeTab === "medications" && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h2 className={`text-xl font-semibold ${getTextColor()}`}>
                 My Medications
               </h2>
               <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 flex items-center gap-2">
@@ -1191,7 +1260,7 @@ const Dashboard = () => {
               </button>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
+            <div className={getCardClasses()}>
               <div className="relative w-full mb-4">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-gray-400" />
@@ -1199,7 +1268,11 @@ const Dashboard = () => {
                 <input
                   type="text"
                   placeholder="Search medications"
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm"
+                  className={`block w-full pl-10 pr-3 py-2 border rounded-md leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm ${
+                    isDarkMode
+                      ? "border-gray-600 bg-gray-700 text-white dark:focus:ring-blue-400 dark:focus:border-blue-400 placeholder-gray-400"
+                      : "border-gray-300 bg-white text-gray-900 focus:border-blue-500 placeholder-gray-500"
+                  }`}
                 />
               </div>
 
@@ -1212,14 +1285,22 @@ const Dashboard = () => {
                     >
                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                         <div className="flex items-center gap-4">
-                          <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-                            <Pill className="w-6 h-6 text-green-600 dark:text-green-400" />
+                          <div
+                            className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                              isDarkMode ? "bg-green-900/30" : "bg-green-100"
+                            }`}
+                          >
+                            <Pill
+                              className={`w-6 h-6 ${
+                                isDarkMode ? "text-green-400" : "text-green-600"
+                              }`}
+                            />
                           </div>
                           <div>
-                            <h3 className="font-medium text-gray-900 dark:text-white">
+                            <h3 className={`font-medium ${getTextColor()}`}>
                               {medication.name}
                             </h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className={`text-sm ${getSecondaryTextColor()}`}>
                               {medication.dosage}
                             </p>
                           </div>
@@ -1227,26 +1308,26 @@ const Dashboard = () => {
 
                         <div className="flex items-center gap-4">
                           <div className="text-center">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className={`text-sm ${getSecondaryTextColor()}`}>
                               Frequency
                             </p>
-                            <p className="font-medium text-gray-900 dark:text-white">
+                            <p className={`font-medium ${getTextColor()}`}>
                               {medication.frequency}
                             </p>
                           </div>
                           <div className="text-center">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className={`text-sm ${getSecondaryTextColor()}`}>
                               Time
                             </p>
-                            <p className="font-medium text-gray-900 dark:text-white">
+                            <p className={`font-medium ${getTextColor()}`}>
                               {medication.time}
                             </p>
                           </div>
                           <div className="text-center">
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className={`text-sm ${getSecondaryTextColor()}`}>
                               Refill Date
                             </p>
-                            <p className="font-medium text-gray-900 dark:text-white">
+                            <p className={`font-medium ${getTextColor()}`}>
                               {formatDate(medication.refillDate)}
                             </p>
                           </div>
@@ -1256,7 +1337,13 @@ const Dashboard = () => {
                           <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors duration-200 text-sm">
                             Refill
                           </button>
-                          <button className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 text-sm">
+                          <button
+                            className={`px-3 py-1 rounded-lg transition-colors duration-200 text-sm ${
+                              isDarkMode
+                                ? "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                            }`}
+                          >
                             Details
                           </button>
                         </div>
@@ -1266,11 +1353,13 @@ const Dashboard = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <Pill className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  <Pill className={`w-16 h-16 ${getSecondaryTextColor()}`} />
+                  <h3 className={`text-lg font-medium ${getTextColor()} mb-2`}>
                     No medications found
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-6">
+                  <p
+                    className={`max-w-md mx-auto mb-6 ${getSecondaryTextColor()}`}
+                  >
                     You don't have any medications added yet. Add a medication
                     to track your prescriptions.
                   </p>
@@ -1282,9 +1371,9 @@ const Dashboard = () => {
             </div>
 
             {/* Medication Reminders */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
+            <div className={getCardClasses()}>
               <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h2 className={`text-lg font-semibold ${getTextColor()}`}>
                   Medication Reminders
                 </h2>
                 <button className="text-blue-600 dark:text-blue-400 text-sm hover:underline">
@@ -1292,14 +1381,32 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+              <div
+                className={`border rounded-lg p-4 mb-4 ${
+                  isDarkMode
+                    ? "bg-blue-900/20 border-blue-800"
+                    : "bg-blue-50 border-blue-200"
+                }`}
+              >
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                  <AlertCircle
+                    className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                      isDarkMode ? "text-blue-400" : "text-blue-600"
+                    }`}
+                  />
                   <div>
-                    <h3 className="font-medium text-blue-800 dark:text-blue-300 mb-1">
+                    <h3
+                      className={`font-medium ${
+                        isDarkMode ? "text-blue-300" : "text-blue-800"
+                      } mb-1`}
+                    >
                       Reminder Settings
                     </h3>
-                    <p className="text-blue-700 dark:text-blue-300 text-sm">
+                    <p
+                      className={`text-sm ${
+                        isDarkMode ? "text-blue-300" : "text-blue-700"
+                      }`}
+                    >
                       You can set up medication reminders to receive
                       notifications when it's time to take your medications.
                     </p>
@@ -1308,97 +1415,88 @@ const Dashboard = () => {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-full">
-                      <Pill className="w-5 h-5 text-green-600 dark:text-green-400" />
+                {[
+                  {
+                    title: "Morning Medications",
+                    schedule: "Daily at 8:00 AM",
+                    color: "green",
+                  },
+                  {
+                    title: "Evening Medications",
+                    schedule: "Daily at 8:00 PM",
+                    color: "orange",
+                  },
+                  {
+                    title: "Weekly Medication",
+                    schedule: "Every Sunday at 10:00 AM",
+                    color: "purple",
+                  },
+                ].map((reminder, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`p-2 rounded-full ${
+                          isDarkMode
+                            ? `bg-${reminder.color}-900/30`
+                            : `bg-${reminder.color}-100`
+                        }`}
+                      >
+                        <Pill
+                          className={`w-5 h-5 text-${reminder.color}-600 dark:text-${reminder.color}-400`}
+                        />
+                      </div>
+                      <div>
+                        <h3 className={`font-medium ${getTextColor()}`}>
+                          {reminder.title}
+                        </h3>
+                        <p className={`text-sm ${getSecondaryTextColor()}`}>
+                          {reminder.schedule}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        Morning Medications
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Daily at 8:00 AM
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <label className="inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        defaultChecked
-                      />
-                      <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-full">
-                      <Pill className="w-5 h-5 text-orange-600 dark:text-orange-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        Evening Medications
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Daily at 8:00 PM
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <label className="inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        defaultChecked
-                      />
-                      <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-full">
-                      <Pill className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900 dark:text-white">
-                        Weekly Medication
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Every Sunday at 10:00 AM
-                      </p>
+                    <div className="flex items-center">
+                      <label className="inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          className="sr-only peer"
+                          defaultChecked
+                        />
+                        <div
+                          className={`relative w-11 h-6 rounded-full peer-focus:outline-none peer-focus:ring-4 peer-checked:bg-blue-600 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${
+                            isDarkMode
+                              ? "bg-gray-700 peer-focus:ring-blue-800 after:border-gray-600"
+                              : "bg-gray-200 peer-focus:ring-blue-300 after:border-gray-300"
+                          } peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white`}
+                        ></div>
+                      </label>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <label className="inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        defaultChecked
-                      />
-                      <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                    </label>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
         )}
 
         {/* Footer */}
-        <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div
+          className={`mt-8 p-4 rounded-xl border ${
+            isDarkMode
+              ? "bg-gray-800 border-gray-700"
+              : "bg-gray-50 border-gray-200"
+          }`}
+        >
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0 mt-0.5" />
+            <AlertCircle
+              className={`w-5 h-5 flex-shrink-0 mt-0.5 ${getSecondaryTextColor()}`}
+            />
             <div>
-              <h3 className="font-medium text-gray-900 dark:text-white mb-1">
+              <h3 className={`font-medium ${getTextColor()} mb-1`}>
                 Need help?
               </h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm">
+              <p className={`text-sm ${getSecondaryTextColor()}`}>
                 If you need assistance with your dashboard or have questions
                 about your health data, please contact our support team.
               </p>

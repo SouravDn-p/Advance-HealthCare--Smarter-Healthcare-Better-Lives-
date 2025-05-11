@@ -14,8 +14,8 @@ import axios from "axios";
 import UnAuthorizedAccess from "../../../../extra/errors/UnAuthorizedAccess";
 import useAuth from "../../../../hooks/useAuth";
 
-const AppointmentManage = ({ isDarkMode, toggleDarkMode }) => {
-  const { dbUser } = useAuth();
+const AppointmentManage = () => {
+  const { dbUser, isDarkMode, toggleDarkMode } = useAuth();
   // Sample appointments data
   const [appointments, setAppointments] = useState([
     {

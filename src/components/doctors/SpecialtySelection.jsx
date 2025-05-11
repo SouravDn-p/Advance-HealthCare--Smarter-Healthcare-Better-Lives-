@@ -16,6 +16,7 @@ import {
   FlaskConical,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 const specialties = [
   {
@@ -137,14 +138,30 @@ const specialties = [
 ];
 
 const SpecialtySelection = () => {
+  const { isDarkMode } = useAuth();
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 py-12 px-4 sm:px-6">
+    <div
+      className={`min-h-screen  py-12 px-4 sm:px-6 ${
+        isDarkMode
+          ? "bg-gradient-to-b from-gray-900 to-gray-800 text-gray-200"
+          : "bg-gradient-to-r from-[#D3E2CD] to-[#e8f0e5] text-gray-900"
+      } transition-all relative duration-300`}
+    >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2
+            className={`text-3xl md:text-4xl font-bold   ${
+              isDarkMode ? " text-gray-200" : " text-gray-900"
+            }mb-4`}
+          >
             Choose Your Specialty
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p
+            className={`${
+              isDarkMode ? "text-gray-300 " : "text-gray-600 "
+            } max-w-2xl mx-auto`}
+          >
             Select from our wide range of medical specialties to find the right
             healthcare professional for your needs
           </p>
@@ -155,7 +172,11 @@ const SpecialtySelection = () => {
             <Link
               to={`/doctors/${specialty.title}`}
               key={index}
-              className="group relative bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700 cursor-pointer"
+              className={`group relative ${
+                isDarkMode
+                  ? "bg-gray-800  border-gray-700"
+                  : "bg-white  border-gray-100"
+              } rounded-xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 border   cursor-pointer`}
             >
               <div
                 className={`absolute inset-0 bg-${specialty.color}-500 opacity-0 group-hover:opacity-5 rounded-xl transition-opacity duration-300`}
@@ -166,16 +187,30 @@ const SpecialtySelection = () => {
                 className="flex items-start space-x-4"
               >
                 <div
-                  className={`flex-shrink-0 p-3 rounded-lg bg-${specialty.color}-100 dark:bg-${specialty.color}-900/20 text-${specialty.color}-500 dark:text-${specialty.color}-400 group-hover:scale-110 transition-transform duration-300`}
+                  className={`flex-shrink-0 p-3 rounded-lg ${
+                    isDarkMode
+                      ? `bg-${specialty.color}-900/20 text-${specialty.color}-400`
+                      : `bg-${specialty.color}-100 text-${specialty.color}-500`
+                  }     group-hover:scale-110 transition-transform duration-300`}
                 >
                   {specialty.icon}
                 </div>
 
                 <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                  <h3
+                    className={`text-xl font-semibold ${
+                      isDarkMode
+                        ? "text-white  group-hover:text-blue-600"
+                        : "text-gray-900 group-hover:text-blue-400"
+                    }   mb-2  `}
+                  >
                     {specialty.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                  <p
+                    className={`${
+                      isDarkMode ? "text-gray-300  " : "text-gray-600"
+                    }   text-sm leading-relaxed`}
+                  >
                     {specialty.description}
                   </p>
                 </div>
@@ -183,7 +218,9 @@ const SpecialtySelection = () => {
 
               <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transform translate-x-full group-hover:translate-x-0 transition-all duration-300">
                 <svg
-                  className="w-6 h-6 text-gray-400 dark:text-gray-500"
+                  className={`w-6 h-6  ${
+                    isDarkMode ? "text-gray-500" : "text-gray-400 "
+                  }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

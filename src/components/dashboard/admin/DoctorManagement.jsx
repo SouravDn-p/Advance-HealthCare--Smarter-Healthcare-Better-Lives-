@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -25,86 +26,17 @@ import Swal from "sweetalert2";
 import UnAuthorizedAccess from "../../../extra/errors/UnAuthorizedAccess";
 
 const DoctorManagement = () => {
-  var { doctors, setDoctors, dbUser } = useAuth();
+  const { doctors, setDoctors, dbUser, isDarkMode } = useAuth();
   const axiosPublic = useAxiosPublic();
-  // State for doctors list
-  // var [doctors, setDoctors] = useState([
-  //   {
-  //     id: 1,
-  //     name: "Dr. Sarah Johnson",
-  //     specialty: "Cardiology",
-  //     experience: "15 years experience",
-  //     image:
-  //       "https://images.pexels.com/photos/4167542/pexels-photo-4167542.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  //     rating: 4.9,
-  //     patients: "2,000+",
-  //     availability: "Mon - Fri",
-  //     achievements: [
-  //       "Best Cardiology Award 2023",
-  //       "Published 24 Research Papers",
-  //     ],
-  //     hospital: "Heart Care Hospital",
-  //     consultation_fee: "150",
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "Dr. Michael Chen",
-  //     specialty: "Neurology",
-  //     experience: "12 years experience",
-  //     image:
-  //       "https://images.pexels.com/photos/5452293/pexels-photo-5452293.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  //     rating: 4.8,
-  //     patients: "1,800+",
-  //     availability: "Tue - Sat",
-  //     achievements: [
-  //       "Neurological Research Excellence Award",
-  //       "Published 18 Research Papers",
-  //     ],
-  //     hospital: "City Neurology Center",
-  //     consultation_fee: "180",
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "Dr. Emily Rodriguez",
-  //     specialty: "Pediatrics",
-  //     experience: "10 years experience",
-  //     image:
-  //       "https://images.pexels.com/photos/5214958/pexels-photo-5214958.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-  //     rating: 4.9,
-  //     patients: "3,000+",
-  //     availability: "Mon - Thu",
-  //     achievements: [
-  //       "Children's Health Foundation Award",
-  //       "Pediatric Care Excellence",
-  //     ],
-  //     hospital: "Children's Medical Center",
-  //     consultation_fee: "120",
-  //   },
-  // ]);
 
-  // State for form and UI
+  // State for UI and form
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterSpecialty, setFilterSpecialty] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [editingDoctor, setEditingDoctor] = useState(null);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [doctorToDelete, setDoctorToDelete] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [viewMode, setViewMode] = useState("grid"); // grid or table
-
-  useEffect(() => {
-    const fetchDoctors = async () => {
-      try {
-        axiosPublic.get(`/doctors`).then((res) => {
-          setDoctors(res.data);
-        });
-      } catch (err) {
-        console.error("Error fetching doctors:", err);
-      }
-    };
-
-    fetchDoctors();
-  }, [axiosPublic, setDoctors]);
 
   // Form state
   const emptyDoctorForm = {
@@ -150,6 +82,45 @@ const DoctorManagement = () => {
     ).length / itemsPerPage
   );
 
+  // Fetch doctors
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      setIsLoading(true);
+      try {
+        const res = await axiosPublic.get("/doctors");
+        setDoctors(res.data);
+      } catch (err) {
+        console.error("Error fetching doctors:", err);
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Fetch Doctors",
+          text: "Please try again later.",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, [axiosPublic, setDoctors]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterSpecialty]);
+
+  // Utility functions for classNames
+  const getCardClasses = () =>
+    `rounded-lg shadow-sm border p-5 transition-shadow duration-200 ${
+      isDarkMode
+        ? "bg-gray-800 border-gray-700 hover:shadow-md"
+        : "bg-white border-gray-200 hover:shadow-md"
+    }`;
+
+  const getTextColor = () => (isDarkMode ? "text-gray-100" : "text-gray-900");
+  const getSecondaryTextColor = () =>
+    isDarkMode ? "text-gray-400" : "text-gray-500";
+
   // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -158,7 +129,6 @@ const DoctorManagement = () => {
       [name]: value,
     });
 
-    // Clear error for this field when user types
     if (formErrors[name]) {
       setFormErrors({
         ...formErrors,
@@ -171,7 +141,6 @@ const DoctorManagement = () => {
   const handleAchievementChange = (index, value) => {
     const updatedAchievements = [...formData.achievements];
     updatedAchievements[index] = value;
-
     setFormData({
       ...formData,
       achievements: updatedAchievements,
@@ -212,25 +181,27 @@ const DoctorManagement = () => {
       errors.consultation_fee = "Consultation fee is required";
 
     // Validate image URL
-    // if (!formData.image.trim()) {
-    //   errors.image = "Image URL is required";
-    // } else if (
-    //   !/^https?:\/\/.+\.(jpg|jpeg|png|webp)(\?.*)?$/i.test(formData.image)
-    // ) {
-    //   errors.image = "Please enter a valid image URL";
-    // }
+    if (!formData.image.trim()) {
+      errors.image = "Image URL is required";
+    } else if (
+      !/^https?:\/\/.+\.(jpg|jpeg|png|webp)(\?.*)?$/i.test(formData.image)
+    ) {
+      errors.image = "Please enter a valid image URL";
+    }
 
     // Validate numeric fields
-    if (
-      isNaN(Number.parseFloat(formData.rating)) ||
-      Number.parseFloat(formData.rating) < 0 ||
-      Number.parseFloat(formData.rating) > 5
-    ) {
+    const rating = Number.parseFloat(formData.rating);
+    if (isNaN(rating) || rating < 0 || rating > 5) {
       errors.rating = "Rating must be between 0 and 5";
     }
 
     if (isNaN(Number.parseFloat(formData.consultation_fee))) {
       errors.consultation_fee = "Consultation fee must be a number";
+    }
+
+    // Validate patients format (e.g., "2,000+" or number)
+    if (formData.patients && !/^\d{1,3}(,\d{3})*\+?$/.test(formData.patients)) {
+      errors.patients = "Patients must be a number or format like '2,000+'";
     }
 
     return errors;
@@ -240,56 +211,71 @@ const DoctorManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate form
     const errors = validateForm();
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
 
-    if (editingDoctor) {
-      // Update existing doctor
-      const updatedDoctors = doctors.map((doctor) =>
-        doctor.id === editingDoctor.id ? { ...formData, id: doctor.id } : doctor
-      );
-      setDoctors(updatedDoctors);
-      setEditingDoctor(null);
-    } else {
-      // Add new doctor
-      const newDoctor = {
-        ...formData,
-        id: Date.now(), // Simple ID generation
-        // Filter out empty achievements
-        achievements: formData.achievements.filter(
-          (achievement) => achievement.trim() !== ""
-        ),
-      };
-      setDoctors([...doctors, newDoctor]);
-
-      const response = await axiosPublic.post("/addDoctor", {
-        doctor: newDoctor,
-      });
-      if (response.status === 201) {
-        Swal.fire({
-          icon: "success",
-          title: "Successfully Added Doctor",
-          showConfirmButton: false,
-          timer: 1500,
+    setIsLoading(true);
+    try {
+      if (editingDoctor) {
+        // Update existing doctor
+        const response = await axiosPublic.put(`/doctors/${editingDoctor._id}`, {
+          doctor: { ...formData, id: editingDoctor._id },
         });
+        if (response.status === 200) {
+          setDoctors(
+            doctors.map((doctor) =>
+              doctor._id === editingDoctor._id
+                ? { ...formData, _id: doctor._id }
+                : doctor
+            )
+          );
+          Swal.fire({
+            icon: "success",
+            title: "Doctor Updated",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Failed to Add Doctor",
-          text: "Something went wrong. Please try again!",
-          confirmButtonText: "Okay",
+        // Add new doctor
+        const newDoctor = {
+          ...formData,
+          id: Date.now(), // Temporary ID for frontend
+          achievements: formData.achievements.filter(
+            (achievement) => achievement.trim() !== ""
+          ),
+        };
+        const response = await axiosPublic.post("/addDoctor", {
+          doctor: newDoctor,
         });
+        if (response.status === 201) {
+          setDoctors([...doctors, response.data]);
+          Swal.fire({
+            icon: "success",
+            title: "Doctor Added",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
       }
-    }
 
-    // Reset form and hide it
-    setFormData(emptyDoctorForm);
-    setShowAddForm(false);
-    setFormErrors({});
+      // Reset form and hide it
+      setFormData(emptyDoctorForm);
+      setShowAddForm(false);
+      setEditingDoctor(null);
+      setFormErrors({});
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: editingDoctor ? "Failed to Update" : "Failed to Add",
+        text: "Something went wrong. Please try again!",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Handle edit doctor
@@ -302,22 +288,42 @@ const DoctorManagement = () => {
 
   // Handle delete doctor
   const handleDeleteClick = (doctor) => {
-    setDoctorToDelete(doctor);
-    setIsDeleteModalOpen(true);
+    Swal.fire({
+      title: `Delete ${doctor.name}?`,
+      text: "This action cannot be undone.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setIsLoading(true);
+        try {
+          const response = await axiosPublic.delete(`/doctors/${doctor._id}`);
+          if (response.status === 200) {
+            setDoctors(doctors.filter((d) => d._id !== doctor._id));
+            Swal.fire({
+              icon: "success",
+              title: "Doctor Deleted",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          }
+        } catch (err) {
+          Swal.fire({
+            icon: "error",
+            title: "Failed to Delete",
+            text: "Something went wrong. Please try again!",
+          });
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    });
   };
 
-  const confirmDelete = () => {
-    if (doctorToDelete) {
-      const updatedDoctors = doctors?.filter(
-        (doctor) => doctor.id !== doctorToDelete.id
-      );
-      setDoctors(updatedDoctors);
-      setIsDeleteModalOpen(false);
-      setDoctorToDelete(null);
-    }
-  };
-
-  // Filter doctors based on search and specialty filter
+  // Filter doctors
   const filteredDoctors = doctors?.filter(
     (doctor) =>
       doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
@@ -330,25 +336,25 @@ const DoctorManagement = () => {
     currentPage * itemsPerPage
   );
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, filterSpecialty]);
-
-  if (dbUser?.role != "admin") {
+  // Authorization check
+  if (dbUser?.role !== "admin") {
     return <UnAuthorizedAccess />;
   }
 
   return (
-    <div className="p-4 lg:p-6 space-y-6">
+    <div
+      className={`p-4 lg:p-6 space-y-6 min-h-screen ${
+        isDarkMode ? "bg-gray-900" : "bg-gray-50"
+      } transition-colors duration-300`}
+    >
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className={`text-2xl font-bold ${getTextColor()}`}>
             Doctor Management
           </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Add, edit and manage doctors in the system
+          <p className={`mt-1 text-sm ${getSecondaryTextColor()}`}>
+            Add, edit, and manage doctors in the system
           </p>
         </div>
         <div className="mt-4 md:mt-0">
@@ -359,7 +365,8 @@ const DoctorManagement = () => {
               setFormData(emptyDoctorForm);
               setFormErrors({});
             }}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 disabled:opacity-50"
+            disabled={isLoading}
           >
             {showAddForm ? (
               <>
@@ -378,8 +385,8 @@ const DoctorManagement = () => {
 
       {/* Add/Edit Doctor Form */}
       {showAddForm && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-5">
-          <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+        <div className={getCardClasses()}>
+          <h2 className={`text-lg font-medium ${getTextColor()} mb-4`}>
             {editingDoctor ? "Edit Doctor" : "Add New Doctor"}
           </h2>
 
@@ -389,7 +396,7 @@ const DoctorManagement = () => {
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className={`block text-sm font-medium ${getTextColor()} mb-1`}
                 >
                   Doctor Name*
                 </label>
@@ -402,12 +409,20 @@ const DoctorManagement = () => {
                   className={`w-full px-3 py-2 border ${
                     formErrors.name
                       ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                      : isDarkMode
+                      ? "border-gray-600"
+                      : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                    isDarkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
+                  }`}
                   placeholder="Dr. Full Name"
+                  aria-describedby={formErrors.name ? "name-error" : undefined}
+                  disabled={isLoading}
                 />
                 {formErrors.name && (
-                  <p className="mt-1 text-sm text-red-500">{formErrors.name}</p>
+                  <p id="name-error" className="mt-1 text-sm text-red-500">
+                    {formErrors.name}
+                  </p>
                 )}
               </div>
 
@@ -415,7 +430,7 @@ const DoctorManagement = () => {
               <div>
                 <label
                   htmlFor="specialty"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className={`block text-sm font-medium ${getTextColor()} mb-1`}
                 >
                   Specialty*
                 </label>
@@ -427,8 +442,14 @@ const DoctorManagement = () => {
                   className={`w-full px-3 py-2 border ${
                     formErrors.specialty
                       ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                      : isDarkMode
+                      ? "border-gray-600"
+                      : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                    isDarkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
+                  }`}
+                  aria-describedby={formErrors.specialty ? "specialty-error" : undefined}
+                  disabled={isLoading}
                 >
                   <option value="">Select Specialty</option>
                   {specialties.map((specialty) => (
@@ -438,7 +459,7 @@ const DoctorManagement = () => {
                   ))}
                 </select>
                 {formErrors.specialty && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p id="specialty-error" className="mt-1 text-sm text-red-500">
                     {formErrors.specialty}
                   </p>
                 )}
@@ -448,7 +469,7 @@ const DoctorManagement = () => {
               <div>
                 <label
                   htmlFor="experience"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className={`block text-sm font-medium ${getTextColor()} mb-1`}
                 >
                   Experience*
                 </label>
@@ -461,12 +482,18 @@ const DoctorManagement = () => {
                   className={`w-full px-3 py-2 border ${
                     formErrors.experience
                       ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                      : isDarkMode
+                      ? "border-gray-600"
+                      : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                    isDarkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
+                  }`}
                   placeholder="15 years experience"
+                  aria-describedby={formErrors.experience ? "experience-error" : undefined}
+                  disabled={isLoading}
                 />
                 {formErrors.experience && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p id="experience-error" className="mt-1 text-sm text-red-500">
                     {formErrors.experience}
                   </p>
                 )}
@@ -476,7 +503,7 @@ const DoctorManagement = () => {
               <div>
                 <label
                   htmlFor="image"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className={`block text-sm font-medium ${getTextColor()} mb-1`}
                 >
                   Profile Image URL*
                 </label>
@@ -490,20 +517,33 @@ const DoctorManagement = () => {
                     className={`w-full px-3 py-2 border ${
                       formErrors.image
                         ? "border-red-500"
-                        : "border-gray-300 dark:border-gray-600"
-                    } rounded-l-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                        : isDarkMode
+                        ? "border-gray-600"
+                        : "border-gray-300"
+                    } rounded-l-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                      isDarkMode
+                        ? "bg-gray-700 text-white"
+                        : "bg-white text-gray-900"
+                    }`}
                     placeholder="https://example.com/image.jpg"
+                    aria-describedby={formErrors.image ? "image-error" : undefined}
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
-                    className="px-3 py-2 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-r-md hover:bg-gray-300 dark:hover:bg-gray-500"
+                    className={`px-3 py-2 ${
+                      isDarkMode
+                        ? "bg-gray-600 text-gray-200 hover:bg-gray-500"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    } rounded-r-md`}
                     title="Upload Image"
+                    disabled={isLoading}
                   >
                     <Upload className="w-5 h-5" />
                   </button>
                 </div>
                 {formErrors.image && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p id="image-error" className="mt-1 text-sm text-red-500">
                     {formErrors.image}
                   </p>
                 )}
@@ -526,7 +566,7 @@ const DoctorManagement = () => {
               <div>
                 <label
                   htmlFor="rating"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className={`block text-sm font-medium ${getTextColor()} mb-1`}
                 >
                   Rating (0-5)
                 </label>
@@ -542,11 +582,17 @@ const DoctorManagement = () => {
                   className={`w-full px-3 py-2 border ${
                     formErrors.rating
                       ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                      : isDarkMode
+                      ? "border-gray-600"
+                      : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                    isDarkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
+                  }`}
+                  aria-describedby={formErrors.rating ? "rating-error" : undefined}
+                  disabled={isLoading}
                 />
                 {formErrors.rating && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p id="rating-error" className="mt-1 text-sm text-red-500">
                     {formErrors.rating}
                   </p>
                 )}
@@ -556,7 +602,7 @@ const DoctorManagement = () => {
               <div>
                 <label
                   htmlFor="patients"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className={`block text-sm font-medium ${getTextColor()} mb-1`}
                 >
                   Patients Count
                 </label>
@@ -566,16 +612,31 @@ const DoctorManagement = () => {
                   name="patients"
                   value={formData.patients}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className={`w-full px-3 py-2 border ${
+                    formErrors.patients
+                      ? "border-red-500"
+                      : isDarkMode
+                      ? "border-gray-600"
+                      : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                    isDarkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
+                  }`}
                   placeholder="2,000+"
+                  aria-describedby={formErrors.patients ? "patients-error" : undefined}
+                  disabled={isLoading}
                 />
+                {formErrors.patients && (
+                  <p id="patients-error" className="mt-1 text-sm text-red-500">
+                    {formErrors.patients}
+                  </p>
+                )}
               </div>
 
               {/* Availability */}
               <div>
                 <label
                   htmlFor="availability"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className={`block text-sm font-medium ${getTextColor()} mb-1`}
                 >
                   Availability*
                 </label>
@@ -588,12 +649,20 @@ const DoctorManagement = () => {
                   className={`w-full px-3 py-2 border ${
                     formErrors.availability
                       ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                      : isDarkMode
+                      ? "border-gray-600"
+                      : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                    isDarkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
+                  }`}
                   placeholder="Mon - Fri"
+                  aria-describedby={
+                    formErrors.availability ? "availability-error" : undefined
+                  }
+                  disabled={isLoading}
                 />
                 {formErrors.availability && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p id="availability-error" className="mt-1 text-sm text-red-500">
                     {formErrors.availability}
                   </p>
                 )}
@@ -603,7 +672,7 @@ const DoctorManagement = () => {
               <div>
                 <label
                   htmlFor="hospital"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className={`block text-sm font-medium ${getTextColor()} mb-1`}
                 >
                   Hospital*
                 </label>
@@ -616,12 +685,18 @@ const DoctorManagement = () => {
                   className={`w-full px-3 py-2 border ${
                     formErrors.hospital
                       ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                      : isDarkMode
+                      ? "border-gray-600"
+                      : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                    isDarkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
+                  }`}
                   placeholder="Hospital Name"
+                  aria-describedby={formErrors.hospital ? "hospital-error" : undefined}
+                  disabled={isLoading}
                 />
                 {formErrors.hospital && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p id="hospital-error" className="mt-1 text-sm text-red-500">
                     {formErrors.hospital}
                   </p>
                 )}
@@ -631,7 +706,7 @@ const DoctorManagement = () => {
               <div>
                 <label
                   htmlFor="consultation_fee"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  className={`block text-sm font-medium ${getTextColor()} mb-1`}
                 >
                   Consultation Fee ($)*
                 </label>
@@ -644,12 +719,23 @@ const DoctorManagement = () => {
                   className={`w-full px-3 py-2 border ${
                     formErrors.consultation_fee
                       ? "border-red-500"
-                      : "border-gray-300 dark:border-gray-600"
-                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white`}
+                      : isDarkMode
+                      ? "border-gray-600"
+                      : "border-gray-300"
+                  } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                    isDarkMode ? "bg-gray-700 text-white" : "bg-white text-gray-900"
+                  }`}
                   placeholder="150"
+                  aria-describedby={
+                    formErrors.consultation_fee ? "consultation_fee-error" : undefined
+                  }
+                  disabled={isLoading}
                 />
                 {formErrors.consultation_fee && (
-                  <p className="mt-1 text-sm text-red-500">
+                  <p
+                    id="consultation_fee-error"
+                    className="mt-1 text-sm text-red-500"
+                  >
                     {formErrors.consultation_fee}
                   </p>
                 )}
@@ -658,7 +744,9 @@ const DoctorManagement = () => {
 
             {/* Achievements */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label
+                className={`block text-sm font-medium ${getTextColor()} mb-2`}
+              >
                 Achievements
               </label>
               {formData.achievements.map((achievement, index) => (
@@ -669,13 +757,21 @@ const DoctorManagement = () => {
                     onChange={(e) =>
                       handleAchievementChange(index, e.target.value)
                     }
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className={`flex-1 px-3 py-2 border ${
+                      isDarkMode ? "border-gray-600" : "border-gray-300"
+                    } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 ${
+                      isDarkMode
+                        ? "bg-gray-700 text-white"
+                        : "bg-white text-gray-900"
+                    }`}
                     placeholder={`Achievement ${index + 1}`}
+                    disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => removeAchievementField(index)}
                     className="ml-2 p-2 text-gray-500 hover:text-red-500"
+                    disabled={isLoading}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -684,7 +780,10 @@ const DoctorManagement = () => {
               <button
                 type="button"
                 onClick={addAchievementField}
-                className="mt-2 text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center"
+                className={`mt-2 text-sm ${
+                  isDarkMode ? "text-blue-400" : "text-blue-600"
+                } hover:underline flex items-center`}
+                disabled={isLoading}
               >
                 <Plus className="w-4 h-4 mr-1" /> Add Achievement
               </button>
@@ -700,15 +799,46 @@ const DoctorManagement = () => {
                   setFormData(emptyDoctorForm);
                   setFormErrors({});
                 }}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+                className={`px-4 py-2 border ${
+                  isDarkMode ? "border-gray-600" : "border-gray-300"
+                } rounded-md shadow-sm text-sm font-medium ${
+                  isDarkMode
+                    ? "text-gray-300 bg-gray-700 hover:bg-gray-600"
+                    : "text-gray-700 bg-white hover:bg-gray-50"
+                } focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400`}
+                disabled={isLoading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 flex items-center"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 flex items-center disabled:opacity-50"
+                disabled={isLoading}
               >
-                <Save className="w-4 h-4 mr-2" />
+                {isLoading ? (
+                  <svg
+                    className="animate-spin h-4 w-4 mr-2 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                ) : (
+                  <Save className="w-4 h-4 mr-2" />
+                )}
                 {editingDoctor ? "Update Doctor" : "Add Doctor"}
               </button>
             </div>
@@ -727,7 +857,14 @@ const DoctorManagement = () => {
             placeholder="Search doctors..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm"
+            className={`block w-full pl-10 pr-3 py-2 border ${
+              isDarkMode ? "border-gray-600" : "border-gray-300"
+            } rounded-md leading-5 ${
+              isDarkMode
+                ? "bg-gray-700 text-white placeholder-gray-400"
+                : "bg-white text-gray-900 placeholder-gray-500"
+            } focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm`}
+            disabled={isLoading}
           />
         </div>
 
@@ -736,7 +873,14 @@ const DoctorManagement = () => {
             <select
               value={filterSpecialty}
               onChange={(e) => setFilterSpecialty(e.target.value)}
-              className="pl-3 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 sm:text-sm"
+              className={`pl-3 pr-8 py-2 border ${
+                isDarkMode ? "border-gray-600" : "border-gray-300"
+              } rounded-md leading-5 ${
+                isDarkMode
+                  ? "bg-gray-700 text-white"
+                  : "bg-white text-gray-900"
+              } focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 sm:text-sm`}
+              disabled={isLoading}
             >
               <option value="">All Specialties</option>
               {specialties.map((specialty) => (
@@ -750,14 +894,23 @@ const DoctorManagement = () => {
             </div>
           </div>
 
-          <div className="flex border border-gray-300 dark:border-gray-600 rounded-md overflow-hidden">
+          <div
+            className={`flex border ${
+              isDarkMode ? "border-gray-600" : "border-gray-300"
+            } rounded-md overflow-hidden`}
+          >
             <button
               onClick={() => setViewMode("grid")}
               className={`p-2 ${
                 viewMode === "grid"
-                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                  : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  ? isDarkMode
+                    ? "bg-blue-900/30 text-blue-400"
+                    : "bg-blue-100 text-blue-600"
+                  : isDarkMode
+                  ? "bg-gray-700 text-gray-300"
+                  : "bg-white text-gray-700"
               }`}
+              disabled={isLoading}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -780,9 +933,14 @@ const DoctorManagement = () => {
               onClick={() => setViewMode("table")}
               className={`p-2 ${
                 viewMode === "table"
-                  ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                  : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                  ? isDarkMode
+                    ? "bg-blue-900/30 text-blue-400"
+                    : "bg-blue-100 text-blue-600"
+                  : isDarkMode
+                  ? "bg-gray-700 text-gray-300"
+                  : "bg-white text-gray-700"
               }`}
+              disabled={isLoading}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -805,15 +963,41 @@ const DoctorManagement = () => {
       </div>
 
       {/* Doctors List */}
-      {currentDoctors?.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 text-center">
+      {isLoading ? (
+        <div className="text-center py-8">
+          <svg
+            className="animate-spin h-8 w-8 mx-auto text-blue-600"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p className={`mt-2 text-sm ${getTextColor()}`}>
+            Loading doctors...
+          </p>
+        </div>
+      ) : currentDoctors?.length === 0 ? (
+        <div className={getCardClasses()}>
           <div className="mx-auto w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-4">
             <Users className="w-8 h-8 text-gray-500 dark:text-gray-400" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+          <h3 className={`text-lg font-medium ${getTextColor()}`}>
             No doctors found
           </h3>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p className={`mt-2 text-sm ${getSecondaryTextColor()}`}>
             {searchTerm || filterSpecialty
               ? "Try adjusting your search or filters"
               : "Add your first doctor to get started"}
@@ -825,6 +1009,7 @@ const DoctorManagement = () => {
                 setFilterSpecialty("");
               }}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+              disabled={isLoading}
             >
               Clear Filters
             </button>
@@ -835,7 +1020,7 @@ const DoctorManagement = () => {
           {currentDoctors?.map((doctor) => (
             <div
               key={doctor._id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+              className={getCardClasses().replace("p-5", "") + " overflow-hidden"}
             >
               <div className="relative">
                 <img
@@ -850,53 +1035,67 @@ const DoctorManagement = () => {
                 <div className="absolute top-2 right-2 flex space-x-2">
                   <button
                     onClick={() => handleEditDoctor(doctor)}
-                    className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className={`p-2 ${
+                      isDarkMode
+                        ? "bg-gray-800 hover:bg-gray-700"
+                        : "bg-white hover:bg-gray-100"
+                    } rounded-full shadow-md`}
                     title="Edit Doctor"
+                    disabled={isLoading}
                   >
                     <Edit className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   </button>
                   <button
                     onClick={() => handleDeleteClick(doctor)}
-                    className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700"
+                    className={`p-2 ${
+                      isDarkMode
+                        ? "bg-gray-800 hover:bg-gray-700"
+                        : "bg-white hover:bg-gray-100"
+                    } rounded-full shadow-md`}
                     title="Delete Doctor"
+                    disabled={isLoading}
                   >
                     <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" />
                   </button>
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                <h3 className={`text-lg font-medium ${getTextColor()}`}>
                   {doctor.name}
                 </h3>
-                <p className="text-sm text-blue-600 dark:text-blue-400">
+                <p
+                  className={`text-sm ${
+                    isDarkMode ? "text-blue-400" : "text-blue-600"
+                  }`}
+                >
                   {doctor.specialty}
                 </p>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p className={`text-sm ${getSecondaryTextColor()} mt-1`}>
                   {doctor.experience}
                 </p>
 
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <div className="flex items-center">
                     <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className={`text-sm ${getTextColor()}`}>
                       {doctor.rating}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <Users className="w-4 h-4 text-gray-500 mr-1" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className={`text-sm ${getTextColor()}`}>
                       {doctor.patients}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <Calendar className="w-4 h-4 text-gray-500 mr-1" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className={`text-sm ${getTextColor()}`}>
                       {doctor.availability}
                     </span>
                   </div>
                   <div className="flex items-center">
                     <DollarSign className="w-4 h-4 text-gray-500 mr-1" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className={`text-sm ${getTextColor()}`}>
                       ${doctor.consultation_fee}
                     </span>
                   </div>
@@ -905,7 +1104,7 @@ const DoctorManagement = () => {
                 <div className="mt-3">
                   <div className="flex items-start">
                     <Building className="w-4 h-4 text-gray-500 mr-1 mt-0.5" />
-                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                    <span className={`text-sm ${getTextColor()}`}>
                       {doctor.hospital}
                     </span>
                   </div>
@@ -916,10 +1115,14 @@ const DoctorManagement = () => {
                     <div className="flex items-start">
                       <Award className="w-4 h-4 text-gray-500 mr-1 mt-0.5" />
                       <div>
-                        <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                        <span
+                          className={`text-sm font-medium ${getTextColor()}`}
+                        >
                           Achievements:
                         </span>
-                        <ul className="mt-1 text-sm text-gray-600 dark:text-gray-400 list-disc list-inside">
+                        <ul
+                          className={`mt-1 text-sm ${getSecondaryTextColor()} list-disc list-inside`}
+                        >
                           {doctor.achievements.map((achievement, index) => (
                             <li key={index} className="ml-1">
                               {achievement}
@@ -935,60 +1138,47 @@ const DoctorManagement = () => {
           ))}
         </div>
       ) : (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className={getCardClasses().replace("p-5", "") + " overflow-hidden"}>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-800/50">
+            <table
+              className={`min-w-full divide-y ${
+                isDarkMode ? "divide-gray-700" : "divide-gray-200"
+              }`}
+            >
+              <thead className={isDarkMode ? "bg-gray-800/50" : "bg-gray-50"}>
                 <tr>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                  >
-                    Doctor
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                  >
-                    Specialty
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                  >
-                    Hospital
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                  >
-                    Rating
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                  >
-                    Fee
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                  >
-                    Availability
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
-                  >
-                    Actions
-                  </th>
+                  {[
+                    "Doctor",
+                    "Specialty",
+                    "Hospital",
+                    "Rating",
+                    "Fee",
+                    "Availability",
+                    "Actions",
+                  ].map((header) => (
+                    <th
+                      key={header}
+                      scope="col"
+                      className={`px-6 py-3 text-left text-xs font-medium ${
+                        isDarkMode ? "text-gray-400" : "text-gray-500"
+                      } uppercase tracking-wider`}
+                    >
+                      {header}
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody
+                className={`${
+                  isDarkMode ? "bg-gray-800" : "bg-white"
+                } divide-y ${isDarkMode ? "divide-gray-700" : "divide-gray-200"}`}
+              >
                 {currentDoctors?.map((doctor) => (
                   <tr
-                    key={doctor.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                    key={doctor._id}
+                    className={`hover:${
+                      isDarkMode ? "bg-gray-700/50" : "bg-gray-50"
+                    }`}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -1005,40 +1195,44 @@ const DoctorManagement = () => {
                           />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          <div
+                            className={`text-sm font-medium ${getTextColor()}`}
+                          >
                             {doctor.name}
                           </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
+                          <div
+                            className={`text-sm ${getSecondaryTextColor()}`}
+                          >
                             {doctor.experience}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900 dark:text-white">
+                      <span className={`text-sm ${getTextColor()}`}>
                         {doctor.specialty}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900 dark:text-white">
+                      <span className={`text-sm ${getTextColor()}`}>
                         {doctor.hospital}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <Star className="w-4 h-4 text-yellow-500 mr-1" />
-                        <span className="text-sm text-gray-900 dark:text-white">
+                        <span className={`text-sm ${getTextColor()}`}>
                           {doctor.rating}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900 dark:text-white">
+                      <span className={`text-sm ${getTextColor()}`}>
                         ${doctor.consultation_fee}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900 dark:text-white">
+                      <span className={`text-sm ${getTextColor()}`}>
                         {doctor.availability}
                       </span>
                     </td>
@@ -1046,15 +1240,25 @@ const DoctorManagement = () => {
                       <div className="flex justify-end space-x-2">
                         <button
                           onClick={() => handleEditDoctor(doctor)}
-                          className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                          className={`${
+                            isDarkMode
+                              ? "text-blue-400 hover:text-blue-300"
+                              : "text-blue-600 hover:text-blue-800"
+                          }`}
                           title="Edit Doctor"
+                          disabled={isLoading}
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(doctor)}
-                          className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
+                          className={`${
+                            isDarkMode
+                              ? "text-red-400 hover:text-red-300"
+                              : "text-red-600 hover:text-red-800"
+                          }`}
                           title="Delete Doctor"
+                          disabled={isLoading}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -1071,7 +1275,7 @@ const DoctorManagement = () => {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-700 dark:text-gray-300">
+          <div className={`text-sm ${getTextColor()}`}>
             Showing{" "}
             <span className="font-medium">
               {(currentPage - 1) * itemsPerPage + 1}
@@ -1086,100 +1290,52 @@ const DoctorManagement = () => {
           <div className="flex space-x-2">
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
+              disabled={currentPage === 1 || isLoading}
               className={`p-2 rounded-md ${
-                currentPage === 1
+                currentPage === 1 || isLoading
                   ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  : isDarkMode
+                  ? "text-gray-300 hover:bg-gray-700"
+                  : "text-gray-700 hover:bg-gray-100"
               }`}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 rounded-md ${
-                  currentPage === page
-                    ? "bg-blue-600 text-white"
-                    : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+              const page = i + 1 + Math.max(0, currentPage - 3);
+              if (page > totalPages) return null;
+              return (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === page
+                      ? "bg-blue-600 text-white"
+                      : isDarkMode
+                      ? "text-gray-300 hover:bg-gray-700"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
+                  disabled={isLoading}
+                >
+                  {page}
+                </button>
+              );
+            })}
             <button
               onClick={() =>
                 setCurrentPage(Math.min(totalPages, currentPage + 1))
               }
-              disabled={currentPage === totalPages}
+              disabled={currentPage === totalPages || isLoading}
               className={`p-2 rounded-md ${
-                currentPage === totalPages
+                currentPage === totalPages || isLoading
                   ? "text-gray-400 dark:text-gray-600 cursor-not-allowed"
-                  : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  : isDarkMode
+                  ? "text-gray-300 hover:bg-gray-700"
+                  : "text-gray-700 hover:bg-gray-100"
               }`}
             >
               <ChevronRight className="w-5 h-5" />
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div
-              className="fixed inset-0 transition-opacity"
-              aria-hidden="true"
-            >
-              <div className="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"></div>
-            </div>
-            <span
-              className="hidden sm:inline-block sm:align-middle sm:h-screen"
-              aria-hidden="true"
-            >
-              &#8203;
-            </span>
-            <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div className="sm:flex sm:items-start">
-                  <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 sm:mx-0 sm:h-10 sm:w-10">
-                    <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
-                  </div>
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white">
-                      Delete Doctor
-                    </h3>
-                    <div className="mt-2">
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Are you sure you want to delete {doctorToDelete?.name}?
-                        This action cannot be undone.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gray-50 dark:bg-gray-800 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  onClick={confirmDelete}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  Delete
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsDeleteModalOpen(false);
-                    setDoctorToDelete(null);
-                  }}
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}

@@ -127,7 +127,7 @@ const COLORS = [
 ];
 
 const AdminDashboard = () => {
-  const { theme, setTheme } = useContext(AuthContexts);
+  const { theme, setTheme, isDarkMode } = useContext(AuthContexts);
 
   const [stats, setStats] = useState({
     appointments: 0,

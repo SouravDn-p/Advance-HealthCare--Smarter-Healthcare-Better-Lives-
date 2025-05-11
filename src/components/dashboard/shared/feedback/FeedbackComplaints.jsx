@@ -151,7 +151,7 @@ const sampleFeedback = [
 ];
 
 const FeedbackComplaints = () => {
-  const { user, dbUser, theme } = useAuth();
+  const { user, dbUser, isDarkMode } = useAuth();
   const [feedbackList, setFeedbackList] = useState(sampleFeedback);
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -373,15 +373,24 @@ const FeedbackComplaints = () => {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1
+            className={`text-2xl font-bold ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}
+          >
             Feedback & Complaints
           </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          <p
+            className={`mt-1 text-sm ${
+              isDarkMode ? "text-gray-400" : "text-gray-500"
+            }`}
+          >
             {isAdmin
               ? "Manage and respond to user feedback and complaints"
               : "Submit and track your feedback and complaints"}
           </p>
         </div>
+
         <button
           onClick={() => setShowForm(true)}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
@@ -402,13 +411,21 @@ const FeedbackComplaints = () => {
             placeholder="Search feedback..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400 sm:text-sm"
+            className={`block w-full pl-10 pr-3 py-2 border rounded-md leading-5 placeholder-gray-500 focus:outline-none focus:ring-2 focus:border-blue-500 sm:text-sm ${
+              isDarkMode
+                ? "border-gray-600 bg-gray-700 placeholder-gray-400 focus:ring-blue-400 focus:border-blue-400"
+                : "border-gray-300 bg-white focus:ring-blue-500 focus:border-blue-500"
+            }`}
           />
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`flex items-center gap-2 px-4 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              isDarkMode
+                ? "border-gray-600 bg-gray-700 text-gray-300 hover:bg-gray-600"
+                : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50"
+            }`}
           >
             <Filter className="w-4 h-4" />
             Filters
@@ -423,74 +440,91 @@ const FeedbackComplaints = () => {
 
       {/* Expanded Filters */}
       {showFilters && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Type
-            </label>
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-            >
-              <option value="all">All Types</option>
-              <option value="feedback">Feedback</option>
-              <option value="complaint">Complaint</option>
-              <option value="suggestion">Suggestion</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Status
-            </label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-            >
-              <option value="all">All Statuses</option>
-              <option value="pending">Pending</option>
-              <option value="in_progress">In Progress</option>
-              <option value="under_review">Under Review</option>
-              <option value="resolved">Resolved</option>
-              <option value="rejected">Rejected</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Priority
-            </label>
-            <select
-              value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-            >
-              <option value="all">All Priorities</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Sort By
-            </label>
-            <select
-              value={`${sortConfig.key}-${sortConfig.direction}`}
-              onChange={(e) => {
-                const [key, direction] = e.target.value.split("-");
+        <div
+          className={`grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded-lg border ${
+            isDarkMode
+              ? "bg-gray-800/50 border-gray-700"
+              : "bg-gray-50 border-gray-200"
+          }`}
+        >
+          {[
+            {
+              label: "Type",
+              value: typeFilter,
+              onChange: setTypeFilter,
+              options: [
+                { value: "all", label: "All Types" },
+                { value: "feedback", label: "Feedback" },
+                { value: "complaint", label: "Complaint" },
+                { value: "suggestion", label: "Suggestion" },
+              ],
+            },
+            {
+              label: "Status",
+              value: statusFilter,
+              onChange: setStatusFilter,
+              options: [
+                { value: "all", label: "All Statuses" },
+                { value: "pending", label: "Pending" },
+                { value: "in_progress", label: "In Progress" },
+                { value: "under_review", label: "Under Review" },
+                { value: "resolved", label: "Resolved" },
+                { value: "rejected", label: "Rejected" },
+              ],
+            },
+            {
+              label: "Priority",
+              value: priorityFilter,
+              onChange: setPriorityFilter,
+              options: [
+                { value: "all", label: "All Priorities" },
+                { value: "high", label: "High" },
+                { value: "medium", label: "Medium" },
+                { value: "low", label: "Low" },
+              ],
+            },
+            {
+              label: "Sort By",
+              value: `${sortConfig.key}-${sortConfig.direction}`,
+              onChange: (val) => {
+                const [key, direction] = val.split("-");
                 setSortConfig({ key, direction });
-              }}
-              className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm"
-            >
-              <option value="createdAt-desc">Newest First</option>
-              <option value="createdAt-asc">Oldest First</option>
-              <option value="priority-desc">Priority (High to Low)</option>
-              <option value="priority-asc">Priority (Low to High)</option>
-              <option value="title-asc">Title (A-Z)</option>
-              <option value="title-desc">Title (Z-A)</option>
-            </select>
-          </div>
+              },
+              options: [
+                { value: "createdAt-desc", label: "Newest First" },
+                { value: "createdAt-asc", label: "Oldest First" },
+                { value: "priority-desc", label: "Priority (High to Low)" },
+                { value: "priority-asc", label: "Priority (Low to High)" },
+                { value: "title-asc", label: "Title (A-Z)" },
+                { value: "title-desc", label: "Title (Z-A)" },
+              ],
+            },
+          ].map(({ label, value, onChange, options }, idx) => (
+            <div key={idx}>
+              <label
+                className={`block text-sm font-medium mb-1 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                {label}
+              </label>
+              <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className={`block w-full px-3 py-2 border rounded-md leading-5 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:text-sm ${
+                  isDarkMode
+                    ? "border-gray-600 bg-gray-700 text-gray-300"
+                    : "border-gray-300 bg-white text-gray-700"
+                }`}
+              >
+                {options.map((opt, i) => (
+                  <option key={i} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ))}
         </div>
       )}
 
@@ -514,7 +548,11 @@ const FeedbackComplaints = () => {
           <div className="mt-6">
             <button
               onClick={() => setShowForm(true)}
-              className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className={`inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white ${
+                isDarkMode
+                  ? "bg-blue-500 hover:bg-blue-600"
+                  : "bg-blue-600 hover:bg-blue-700"
+              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
             >
               <Plus className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
               {isAdmin ? "Add Feedback" : "Submit Feedback"}
@@ -523,44 +561,56 @@ const FeedbackComplaints = () => {
         </div>
       ) : (
         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700 ">
-            <thead className="bg-gray-50 dark:bg-gray-800">
+          <table className="min-w-full divide-y divide-gray-300 dark:divide-gray-700">
+            <thead className={isDarkMode ? "bg-gray-900" : "bg-gray-50"}>
               <tr>
                 <th
                   scope="col"
-                  className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 sm:pl-6"
+                  className={`py-3.5 pl-4 pr-3 text-left text-sm font-semibold ${
+                    isDarkMode ? "text-gray-200" : "text-gray-900"
+                  } sm:pl-6`}
                 >
                   Title
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 hidden md:table-cell"
+                  className={`px-3 py-3.5 text-left text-sm font-semibold ${
+                    isDarkMode ? "text-gray-200" : "text-gray-900"
+                  } hidden md:table-cell`}
                 >
                   Type
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 hidden lg:table-cell"
+                  className={`px-3 py-3.5 text-left text-sm font-semibold ${
+                    isDarkMode ? "text-gray-200" : "text-gray-900"
+                  } hidden lg:table-cell`}
                 >
                   Status
                 </th>
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 hidden lg:table-cell"
+                  className={`px-3 py-3.5 text-left text-sm font-semibold ${
+                    isDarkMode ? "text-gray-200" : "text-gray-900"
+                  } hidden lg:table-cell`}
                 >
                   Priority
                 </th>
                 {isAdmin && (
                   <th
                     scope="col"
-                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 hidden md:table-cell"
+                    className={`px-3 py-3.5 text-left text-sm font-semibold ${
+                      isDarkMode ? "text-gray-200" : "text-gray-900"
+                    } hidden md:table-cell`}
                   >
                     Submitted By
                   </th>
                 )}
                 <th
                   scope="col"
-                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-gray-200 hidden sm:table-cell"
+                  className={`px-3 py-3.5 text-left text-sm font-semibold ${
+                    isDarkMode ? "text-gray-200" : "text-gray-900"
+                  } hidden sm:table-cell`}
                 >
                   Date
                 </th>
@@ -569,20 +619,36 @@ const FeedbackComplaints = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+            <tbody
+              className={`divide-y divide-gray-200 ${
+                isDarkMode ? "bg-gray-800 dark:divide-gray-700" : "bg-white"
+              }`}
+            >
               {filteredAndSortedFeedback.map((feedback) => (
                 <tr
                   key={feedback.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer"
+                  className={`${
+                    isDarkMode ? "hover:bg-gray-700/50" : "hover:bg-gray-50"
+                  } cursor-pointer`}
                   onClick={() => viewFeedbackDetails(feedback)}
                 >
-                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-white sm:pl-6">
+                  <td
+                    className={`whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    } sm:pl-6`}
+                  >
                     <div className="flex items-center">
                       <span className="truncate max-w-[200px]">
                         {feedback.title}
                       </span>
                       {feedback.responses.length > 0 && (
-                        <span className="ml-2 flex-shrink-0 inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                        <span
+                          className={`ml-2 flex-shrink-0 inline-block px-2 py-0.5 text-xs font-medium rounded-full ${
+                            isDarkMode
+                              ? "bg-blue-900/30 text-blue-400"
+                              : "bg-blue-100 text-blue-800"
+                          }`}
+                        >
                           {feedback.responses.length}{" "}
                           {feedback.responses.length === 1
                             ? "response"
@@ -591,7 +657,11 @@ const FeedbackComplaints = () => {
                       )}
                     </div>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                  <td
+                    className={`whitespace-nowrap px-3 py-4 text-sm ${
+                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                    } hidden md:table-cell`}
+                  >
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeBadge(
                         feedback.type
@@ -601,7 +671,11 @@ const FeedbackComplaints = () => {
                       <span className="ml-1 capitalize">{feedback.type}</span>
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400 hidden lg:table-cell">
+                  <td
+                    className={`whitespace-nowrap px-3 py-4 text-sm ${
+                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                    } hidden lg:table-cell`}
+                  >
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadge(
                         feedback.status
@@ -613,7 +687,11 @@ const FeedbackComplaints = () => {
                       </span>
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400 hidden lg:table-cell">
+                  <td
+                    className={`whitespace-nowrap px-3 py-4 text-sm ${
+                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                    } hidden lg:table-cell`}
+                  >
                     <span
                       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPriorityBadge(
                         feedback.priority
@@ -623,23 +701,45 @@ const FeedbackComplaints = () => {
                     </span>
                   </td>
                   {isAdmin && (
-                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                    <td
+                      className={`whitespace-nowrap px-3 py-4 text-sm ${
+                        isDarkMode ? "text-gray-400" : "text-gray-500"
+                      } hidden md:table-cell`}
+                    >
                       <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-600 dark:text-gray-300">
+                        <div
+                          className={`h-8 w-8 rounded-full ${
+                            isDarkMode ? "bg-gray-700" : "bg-gray-200"
+                          } flex items-center justify-center ${
+                            isDarkMode ? "text-gray-300" : "text-gray-600"
+                          }`}
+                        >
                           <User className="h-4 w-4" />
                         </div>
                         <div className="ml-2">
-                          <div className="font-medium text-gray-900 dark:text-white">
+                          <div
+                            className={`font-medium ${
+                              isDarkMode ? "text-white" : "text-gray-900"
+                            }`}
+                          >
                             {feedback.createdBy.name}
                           </div>
-                          <div className="text-gray-500 dark:text-gray-400 text-xs">
+                          <div
+                            className={`text-xs ${
+                              isDarkMode ? "text-gray-400" : "text-gray-500"
+                            }`}
+                          >
                             {feedback.createdBy.email}
                           </div>
                         </div>
                       </div>
                     </td>
                   )}
-                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">
+                  <td
+                    className={`whitespace-nowrap px-3 py-4 text-sm ${
+                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                    } hidden sm:table-cell`}
+                  >
                     <div className="flex items-center">
                       <Calendar className="h-4 w-4 mr-1" />
                       {formatDate(feedback.createdAt)}
@@ -655,7 +755,11 @@ const FeedbackComplaints = () => {
                           <div>
                             <button
                               type="button"
-                              className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                              className={`inline-flex items-center p-1 border border-transparent rounded-full shadow-sm ${
+                                isDarkMode
+                                  ? "text-gray-300 hover:bg-gray-600"
+                                  : "text-gray-500 hover:bg-gray-100"
+                              } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 openResponseForm(feedback);
@@ -671,7 +775,11 @@ const FeedbackComplaints = () => {
                         <div>
                           <button
                             type="button"
-                            className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            className={`inline-flex items-center p-1 border border-transparent rounded-full shadow-sm ${
+                              isDarkMode
+                                ? "text-gray-300 hover:bg-gray-600"
+                                : "text-gray-500 hover:bg-gray-100"
+                            } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
                             onClick={(e) => {
                               e.stopPropagation();
                               viewFeedbackDetails(feedback);
@@ -699,15 +807,23 @@ const FeedbackComplaints = () => {
               className="fixed inset-0 transition-opacity"
               aria-hidden="true"
             >
-              <div className="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"></div>
+              <div
+                className={`absolute inset-0 ${
+                  isDarkMode ? "bg-gray-900" : "bg-gray-500"
+                } opacity-75`}
+              ></div>
             </div>
             <span
-              className="hidden sm:inline-block sm:align-middle sm:h-screen"
+              className="hidden sm:inline-block sabbia-middle sm:h-screen"
               aria-hidden="true"
             >
-              &#8203;
+              ​
             </span>
-            <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div
+              className={`inline-block align-bottom ${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              } rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full`}
+            >
               <FeedbackForm
                 onSubmit={handleCreateFeedback}
                 onCancel={() => setShowForm(false)}
@@ -725,15 +841,23 @@ const FeedbackComplaints = () => {
               className="fixed inset-0 transition-opacity"
               aria-hidden="true"
             >
-              <div className="absolute inset-0 bg-gray-500 dark:bg-gray-900 opacity-75"></div>
+              <div
+                className={`absolute inset-0 ${
+                  isDarkMode ? "bg-gray-900" : "bg-gray-500"
+                } opacity-75`}
+              ></div>
             </div>
             <span
               className="hidden sm:inline-block sm:align-middle sm:h-screen"
               aria-hidden="true"
             >
-              &#8203;
+              ​
             </span>
-            <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div
+              className={`inline-block align-bottom ${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              } rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full`}
+            >
               <ResponseForm
                 feedback={selectedFeedback}
                 onSubmit={(response) =>
