@@ -34,6 +34,7 @@ import AppointmentScheduling from "../components/dashboard/doctors/Appointment/A
 import DoctorProfile from "../components/dashboard/doctors/Profile/DoctorProfile";
 import DoctorMedicalRecords from "../components/dashboard/doctors/medicalRecord/DoctorMedicalRecords";
 import AppointmentManage from "../components/dashboard/admin/appointment/AppointmentManage";
+import Chat from "../components/Chats/Chat";
 
 const DoctorsCategoryWrapper = () => {
   const { speciality } = useParams();
@@ -129,7 +130,10 @@ export const router = createBrowserRouter([
         path: "emergency",
         element: <EmergencyServices />,
       },
-
+      {
+        path: "messages",
+        element: <Chat />,
+      },
       //Doctors path
       {
         path: "managePatients",

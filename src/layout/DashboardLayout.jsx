@@ -195,6 +195,11 @@ const DashboardLayout = () => {
       section: "dashboard/bloodDonors",
     },
     {
+      name: "Messages",
+      icon: <MessageCircleCode className="w-5 h-5" />,
+      section: "dashboard/messages",
+    },
+    {
       name: "Staff",
       icon: <FaUserNurse className="w-5 h-5" />,
       section: "dashboard/staff",

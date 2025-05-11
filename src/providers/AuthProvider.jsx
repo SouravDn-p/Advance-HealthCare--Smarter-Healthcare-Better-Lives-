@@ -17,12 +17,15 @@ const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [dbUser, setDbUser] = useState(null);
   const [response, setResponse] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const [doctors, setDoctors] = useState(null);
   const axiosSecure = useAxiosSecure();
   const axiosPublic = useAxiosPublic();
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [loader, setLoader] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+
 
   const toggleTheme = () => {
     const newTheme = theme === "light" ? "dark" : "light";
@@ -153,6 +156,10 @@ const AuthProvider = ({ children }) => {
     errorMessage,
     setErrorMessage,
     isDarkMode,
+    isMobile,
+    setIsMobile,
+    selectedUser,
+    setSelectedUser,
   };
 
   return (

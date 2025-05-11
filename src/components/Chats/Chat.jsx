@@ -1,10 +1,9 @@
-import { useState, useEffect, useRef, useContext } from "react";
+import { useState, useEffect, useRef } from "react";
 import ChatSidebar from "./ChatSidebar";
 import io from "socket.io-client";
 import axios from "axios";
 import auth from "../../firebase/firebase.init";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import ThemeContext from "../Context/ThemeContext";
 import {
   ArrowLeft,
   Send,
@@ -27,17 +26,17 @@ export default function Chat() {
   const [connectionError, setConnectionError] = useState(null);
   const [unreadMessages, setUnreadMessages] = useState({});
   const [isPageVisible, setIsPageVisible] = useState(true);
-  const { isDarkMode } = useContext(ThemeContext);
   const [recentMessages, setRecentMessages] = useState({});
   const [lastMessageTimestamp, setLastMessageTimestamp] = useState(null);
   const [users, setUsers] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
-  const [currentUserRole, setCurrentUserRole] = useState("buyer");
+  const [currentUserRole, setCurrentUserRole] = useState("user");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [messageStatuses, setMessageStatuses] = useState({});
   const [seenMessages, setSeenMessages] = useState({});
-  const { isMobile, setIsMobile, selectedUser, setSelectedUser } = useAuth();
+  const { isMobile, setIsMobile, selectedUser, setSelectedUser, isDarkMode } =
+    useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const axiosPublic = useAxiosPublic();
   const navigate = useNavigate();
@@ -62,7 +61,7 @@ export default function Chat() {
           const userResponse = await axiosPublic.get(`/user/${user.email}`, {
             withCredentials: true,
           });
-          setCurrentUserRole(userResponse.data.role || "buyer");
+          setCurrentUserRole(userResponse.data.role || "user");
 
           const usersResponse = await axiosPublic.get("/users", {
             withCredentials: true,
@@ -85,7 +84,7 @@ export default function Chat() {
   useEffect(() => {
     if (!socketRef.current) {
       socketRef.current = io(
-        "https://rex-auction-server-side-jzyx.onrender.com",
+        "https://advance-healthcare-sourav246.vercel.app",
         {
           withCredentials: true,
           reconnection: true,
@@ -246,7 +245,7 @@ export default function Chat() {
       const since = lastMessageTimestamp
         ? new Date(lastMessageTimestamp).toISOString()
         : null;
-      const url = `https://rex-auction-server-side-jzyx.onrender.com/messages/email/${
+      const url = `https://advance-healthcare-sourav246.vercel.app/messages/email/${
         currentUser.email
       }/${user.email}${since ? `?since=${since}` : ""}`;
 

@@ -18,6 +18,10 @@ const useAuth = () => {
     setErrorMessage,
     signOutUser,
     isDarkMode,
+    isMobile,
+    setIsMobile,
+    selectedUser,
+    setSelectedUser,
   } = useContext(AuthContexts);
   return {
     user,
@@ -36,6 +40,10 @@ const useAuth = () => {
     setErrorMessage,
     signOutUser,
     isDarkMode,
+    isMobile,
+    setIsMobile,
+    selectedUser,
+    setSelectedUser,
   };
 };
 

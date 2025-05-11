@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import axios from "axios";
 import auth from "../../firebase/firebase.init";
 import io from "socket.io-client";
-import LoadingSpinner from "../LoadingSpinner";
-import useAxiosSecure from "../../hooks/useAxiosSecure";
+import LoadingSpinner from "../../extra/loaders/LoadingSpinner";
 import useAxiosPublic from "../../hooks/useAxiosPublic";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export default function ChatSidebar({
   isDarkMode,
@@ -389,7 +388,7 @@ export default function ChatSidebar({
                             : "font-medium"
                         }`}
                       >
-                        {user.name || "No name"}
+                        {user.displayName || "No name"}
                       </p>
                       {lastMessage && (
                         <p
