@@ -20,7 +20,7 @@ import useAuth from "../../hooks/useAuth";
 import MeetOurExperts from "../Home/MeetOurExperts";
 
 const Appointments = () => {
-  const { theme } = useAuth();
+  const { theme , isDarkMode } = useAuth();
   const [activeTab, setActiveTab] = useState("upcoming");
   const [filterOpen, setFilterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");

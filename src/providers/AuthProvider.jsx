@@ -105,6 +105,8 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unSubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      console.log("user", currentUser.photoURL);
+
       if (currentUser?.email) {
         axiosSecure.post("/jwt").then((res) => setResponse(res));
         axiosPublic
@@ -123,6 +125,7 @@ const AuthProvider = ({ children }) => {
       } else {
         axiosSecure.post("/logout").then((res) => setResponse(res));
       }
+
       setLoader(false);
     });
 

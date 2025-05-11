@@ -31,6 +31,7 @@ import useAuth from "../hooks/useAuth";
 import AdminDashboard from "../components/dashboard/admin/dashboard/AdminDashboard";
 import DoctorDashboard from "../components/dashboard/doctors/dashboard/DoctorDashboard";
 import healthTips from "../assets/logo/logo.png";
+import LoadingSpinner from "./loaders/LoadingSpinner";
 
 const Dashboard = () => {
   const { user, dbUser, isDarkMode } = useAuth();
@@ -261,6 +262,10 @@ const Dashboard = () => {
     return <AdminDashboard />;
   } else if (dbUser?.role === "doctor") {
     return <DoctorDashboard />;
+  }
+
+  if (!user || !dbUser) {
+    return <LoadingSpinner />;
   }
 
   return (

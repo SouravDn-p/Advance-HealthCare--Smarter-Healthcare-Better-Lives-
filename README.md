@@ -3,6 +3,9 @@
 advanceadmin@gmail.com
 advanceAdmin246
 
+advancedoctor@gmail.com
+advanceDoctor
+
 ## 🚀 Overview
 
 **Advanced Healthcare** is a modern digital health service platform designed to enhance efficiency, security, and accessibility in healthcare. It leverages **AI, blockchain, telemedicine, and smart integrations** to provide a seamless healthcare experience.

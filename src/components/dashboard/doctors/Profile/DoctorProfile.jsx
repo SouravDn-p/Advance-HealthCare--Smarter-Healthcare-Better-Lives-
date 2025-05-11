@@ -12,8 +12,11 @@ import {
   X,
   Camera,
 } from "react-feather";
+import useAuth from "../../../../hooks/useAuth";
+import LoadingSpinner from "../../../../extra/loaders/LoadingSpinner";
 
 const DoctorProfile = () => {
+  const { user, dbUser, isDarkMode } = useAuth();
   // State for doctor profile data
   const [profile, setProfile] = useState({
     id: "d123",
@@ -62,8 +65,8 @@ const DoctorProfile = () => {
       saturday: { start: "10:00 AM", end: "1:00 PM" },
       sunday: { start: "", end: "" },
     },
-    image: "https://via.placeholder.com/300",
-    coverImage: "https://via.placeholder.com/1200x300",
+    image: user?.photoURL,
+    coverImage: user?.photoURL,
   });
 
   // State for edit mode
@@ -138,6 +141,9 @@ const DoctorProfile = () => {
     setEditedProfile({});
   };
 
+  if (!user) {
+    return <LoadingSpinner />;
+  }
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Success Toast */}
@@ -157,7 +163,7 @@ const DoctorProfile = () => {
       {/* Cover Image */}
       <div className="relative h-48 md:h-64 lg:h-80 w-full mb-16 md:mb-24 rounded-xl overflow-hidden">
         <img
-          src={profile.coverImage || "/placeholder.svg"}
+          src={user?.photoURL || "/placeholder.svg"}
           alt="Cover"
           className="w-full h-full object-cover"
         />
@@ -165,7 +171,7 @@ const DoctorProfile = () => {
         {/* Profile Image */}
         <div className="absolute -bottom-16 left-8 w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-base-100 overflow-hidden">
           <img
-            src={profile.image || "/placeholder.svg"}
+            src={user?.photoURL || "/placeholder.svg"}
             alt={profile.name}
             className="w-full h-full object-cover"
           />

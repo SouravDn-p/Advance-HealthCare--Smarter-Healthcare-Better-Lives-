@@ -53,13 +53,12 @@ import {
 import { FaHouseMedical } from "react-icons/fa6";
 
 const DashboardLayout = () => {
-  const { user, theme, dbUser, toggleTheme, signOutUser } = useAuth();
+  const { user, dbUser, toggleTheme, signOutUser, isDarkMode } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("dashboard");
   const [unreadNotifications, setUnreadNotifications] = useState(3);
-  const isDarkMode = true;
 
   // Toggle sidebar on mobile
   const toggleSidebar = () => {
@@ -99,9 +98,7 @@ const DashboardLayout = () => {
       }
     };
 
-    // Set initial state
     handleResize();
-
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -123,7 +120,6 @@ const DashboardLayout = () => {
       icon: <FileText className="w-5 h-5" />,
       section: "dashboard/medical-records",
     },
-
     {
       name: "Telemedicine",
       icon: <FiMessageSquare className="w-5 h-5" />,
@@ -164,44 +160,6 @@ const DashboardLayout = () => {
       name: "Billing",
       icon: <CreditCard className="w-5 h-5" />,
       section: "dashboard/billing",
-    },
-  ];
-
-  // Sample notifications
-  const notifications = [
-    {
-      id: 1,
-      title: "Appointment Reminder",
-      message:
-        "Your appointment with Dr. Sarah Johnson is tomorrow at 10:00 AM",
-      time: "1 hour ago",
-      read: false,
-      type: "appointment",
-    },
-    {
-      id: 2,
-      title: "Medication Reminder",
-      message: "Time to take your Lisinopril medication",
-      time: "3 hours ago",
-      read: false,
-      type: "medication",
-    },
-    {
-      id: 3,
-      title: "Test Results Available",
-      message: "Your recent blood test results are now available",
-      time: "Yesterday",
-      read: false,
-      type: "test",
-    },
-    {
-      id: 4,
-      title: "Payment Confirmation",
-      message:
-        "Your payment of $150 for the last appointment has been processed",
-      time: "2 days ago",
-      read: true,
-      type: "payment",
     },
   ];
 
@@ -263,6 +221,7 @@ const DashboardLayout = () => {
       section: "dashboard/settings",
     },
   ];
+
   const doctorNavigationItems = [
     {
       name: "Doctor Dashboard",
@@ -351,17 +310,25 @@ const DashboardLayout = () => {
   return (
     <div
       className={`min-h-screen ${
-        theme === "dark"
-          ? "bg-gray-900 text-gray-100"
-          : "bg-gray-50 text-gray-900"
+        isDarkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
       } transition-colors duration-300`}
     >
       {/* Mobile Header */}
-      <div className="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div
+        className={`lg:hidden flex items-center justify-between p-4 ${
+          isDarkMode
+            ? "bg-gray-800 border-gray-700"
+            : "bg-white border-gray-200"
+        } border-b`}
+      >
         <div className="flex items-center">
           <button
             onClick={toggleSidebar}
-            className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className={`p-2 rounded-lg ${
+              isDarkMode
+                ? "text-gray-300 hover:bg-gray-700"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -376,7 +343,11 @@ const DashboardLayout = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-            className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 relative"
+            className={`p-2 rounded-lg relative ${
+              isDarkMode
+                ? "text-gray-300 hover:bg-gray-700"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
           >
             <Bell className="w-6 h-6" />
             {unreadNotifications > 0 && (
@@ -387,7 +358,11 @@ const DashboardLayout = () => {
           </button>
           <button
             onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-            className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className={`p-2 rounded-lg ${
+              isDarkMode
+                ? "text-gray-300 hover:bg-gray-700"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
           >
             <User className="w-6 h-6" />
           </button>
@@ -397,32 +372,52 @@ const DashboardLayout = () => {
       <section className="flex">
         {/* Sidebar */}
         <div
-          className={`fixed  inset-y-0 left-0 z-50 w-72 md:w-96 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-transform duration-300 ease-in-out ${
+          className={`fixed inset-y-0 left-0 z-50 w-72 md:w-96 ${
+            isDarkMode
+              ? "bg-gray-800 border-gray-700"
+              : "bg-white border-gray-200"
+          } border-r transform transition-transform duration-300 ease-in-out ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           } lg:translate-x-0 lg:static lg:inset-auto lg:z-auto`}
         >
           {/* Sidebar Header */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+          <div
+            className={`p-4 border-b flex items-center justify-between ${
+              isDarkMode ? "border-gray-700" : "border-gray-200"
+            }`}
+          >
             <div className="flex items-center">
               <img
                 src="/src/assets/Logo.png"
                 alt="Logo"
                 className="h-8 w-8 mr-2"
               />
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              <h1
+                className={`text-xl font-bold ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
                 Advance Health
               </h1>
             </div>
             <button
               onClick={toggleSidebar}
-              className="lg:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+              className={`lg:hidden p-2 rounded-lg ${
+                isDarkMode
+                  ? "text-gray-300 hover:bg-gray-700"
+                  : "text-gray-600 hover:bg-gray-100"
+              }`}
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* User Profile */}
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div
+            className={`p-4 border-b ${
+              isDarkMode ? "border-gray-700" : "border-gray-200"
+            }`}
+          >
             <div className="flex items-center">
               {user?.displayName ? (
                 <img
@@ -431,16 +426,27 @@ const DashboardLayout = () => {
                   className="w-9 h-9 rounded-full border-2 border-pink-400 transition-all duration-300 hover:border-yellow-400"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
+                <div
+                  className={`w-10 h-10 rounded-full ${
+                    isDarkMode ? "bg-blue-600" : "bg-blue-500"
+                  } flex items-center justify-center text-white font-medium`}
+                >
                   <User className="w-5 h-5" />
                 </div>
               )}
-
               <div className="ml-3">
-                <p className="font-medium text-gray-900 dark:text-white">
+                <p
+                  className={`font-medium ${
+                    isDarkMode ? "text-white" : "text-gray-900"
+                  }`}
+                >
                   {user?.displayName || "Guest User"}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p
+                  className={`text-xs ${
+                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                >
                   Patient ID: {user?.id || "12345678"}
                 </p>
               </div>
@@ -467,8 +473,12 @@ const DashboardLayout = () => {
                   }}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg transition-colors duration-200 ${
                     activeSection === item.section
-                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                      ? isDarkMode
+                        ? "bg-blue-900/20 text-blue-400"
+                        : "bg-blue-50 text-blue-600"
+                      : isDarkMode
+                      ? "text-gray-300 hover:bg-gray-700"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   <div className="flex items-center">
@@ -476,7 +486,13 @@ const DashboardLayout = () => {
                     <span>{item.name}</span>
                   </div>
                   {item.badge && (
-                    <span className="px-2 py-0.5 text-xs rounded-full bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400">
+                    <span
+                      className={`px-2 py-0.5 text-xs rounded-full ${
+                        isDarkMode
+                          ? "bg-red-900/30 text-red-400"
+                          : "bg-red-100 text-red-800"
+                      }`}
+                    >
                       {item.badge}
                     </span>
                   )}
@@ -484,13 +500,21 @@ const DashboardLayout = () => {
               ))}
             </nav>
 
-            {/* Theme Toggle */}
-            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            {/* Theme Toggle and Other Links */}
+            <div
+              className={`mt-6 pt-6 border-t ${
+                isDarkMode ? "border-gray-700" : "border-gray-200"
+              }`}
+            >
               <button
                 onClick={toggleTheme}
-                className="w-full flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
+                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors duration-200 ${
+                  isDarkMode
+                    ? "text-gray-300 hover:bg-gray-700"
+                    : "text-gray-700 hover:bg-gray-100"
+                }`}
               >
-                {theme === "dark" ? (
+                {isDarkMode ? (
                   <>
                     <Sun className="w-5 h-5 mr-3" />
                     <span>Light Mode</span>
@@ -504,12 +528,15 @@ const DashboardLayout = () => {
               </button>
               <Link
                 to={`/dashboard/help`}
-                className="w-full flex items-center px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 mt-2"
+                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors duration-200 ${
+                  isDarkMode
+                    ? "text-gray-300 hover:bg-gray-700"
+                    : "text-gray-700 hover:bg-gray-100"
+                } mt-2`}
               >
                 <HelpCircle className="w-5 h-5 mr-3" />
                 <span>Help & Support</span>
               </Link>
-
               <NavLink
                 to="/"
                 className={({ isActive }) =>
@@ -517,10 +544,10 @@ const DashboardLayout = () => {
                     isActive
                       ? isDarkMode
                         ? "bg-gray-700/60 text-white font-bold shadow-md"
-                        : "bg-gray-300 text-gray-900 font-bold shadow-md"
+                        : "bg-gray-200 text-gray-900 font-bold shadow-md"
                       : isDarkMode
-                      ? "hover:bg-gray-800/40 text-gray-100"
-                      : "hover:bg-gray-200 text-gray-800"
+                      ? "text-gray-100 hover:bg-gray-800/40"
+                      : "text-gray-800 hover:bg-gray-200"
                   }`
                 }
               >
@@ -545,10 +572,10 @@ const DashboardLayout = () => {
                     isActive
                       ? isDarkMode
                         ? "bg-gray-700/60 text-white font-bold shadow-md"
-                        : "bg-gray-300 text-gray-900 font-bold shadow-md"
+                        : "bg-gray-200 text-gray-900 font-bold shadow-md"
                       : isDarkMode
-                      ? "hover:bg-gray-800/40 text-gray-100"
-                      : "hover:bg-gray-200 text-gray-800"
+                      ? "text-gray-100 hover:bg-gray-800/40"
+                      : "text-gray-800 hover:bg-gray-200"
                   }`
                 }
               >
@@ -568,7 +595,11 @@ const DashboardLayout = () => {
               </NavLink>
               <button
                 onClick={handleSignOut}
-                className="w-full flex items-center px-3 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 mt-2"
+                className={`w-full flex items-center px-3 py-2 rounded-lg transition-colors duration-200 ${
+                  isDarkMode
+                    ? "text-red-400 hover:bg-red-900/20"
+                    : "text-red-600 hover:bg-red-50"
+                }`}
               >
                 <LogOut className="w-5 h-5 mr-3" />
                 <span>Sign Out</span>
@@ -586,22 +617,27 @@ const DashboardLayout = () => {
         </div>
 
         {/* Main Content */}
-        <div className=" flex flex-col overflow-y-auto h-screen w-full ">
+        <div className="flex flex-col overflow-y-auto h-screen w-full">
           {/* Desktop Header */}
-          <div className="hidden  lg:flex items-center justify-between p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+          <div
+            className={`hidden lg:flex items-center justify-between p-4 ${
+              isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200"
+            } border-b`}
+          >
             <div className="flex-1">
               <div className="flex items-center space-x-4">
                 <label
                   htmlFor="my-drawer-2"
-                  className={`lg:hidden flex items-center justify-center h-10 w-10 rounded-full ${
+                  className={`lg:hidden flex items-center justify-center h-10 w-10 rounded-full cursor-pointer transition-colors duration-200 ${
                     isDarkMode
                       ? "bg-gray-700 text-purple-400 hover:bg-gray-600"
-                      : "bg-white text-purple-600 hover:bg-white"
-                  } cursor-pointer transition-colors duration-200`}
+                      : "bg-white text-purple-600 hover:bg-gray-100"
+                  }`}
                 >
                   <FaBars size={18} />
                 </label>
-
                 <div className="hidden md:block">
                   <h1
                     className={`text-xl font-semibold ${
@@ -625,7 +661,11 @@ const DashboardLayout = () => {
               <div className="relative">
                 <button
                   onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 relative"
+                  className={`p-2 rounded-lg relative ${
+                    isDarkMode
+                      ? "text-gray-300 hover:bg-gray-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
                 >
                   <Bell className="w-6 h-6" />
                   {unreadNotifications > 0 && (
@@ -634,17 +674,34 @@ const DashboardLayout = () => {
                     </span>
                   )}
                 </button>
-
                 {/* Notifications Dropdown */}
                 {isNotificationsOpen && (
-                  <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
-                    <div className="p-3 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                      <h3 className="font-medium text-gray-900 dark:text-white">
+                  <div
+                    className={`absolute right-0 mt-2 w-80 rounded-lg shadow-lg border z-10 ${
+                      isDarkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-gray-200"
+                    }`}
+                  >
+                    <div
+                      className={`p-3 border-b flex justify-between items-center ${
+                        isDarkMode ? "border-gray-700" : "border-gray-200"
+                      }`}
+                    >
+                      <h3
+                        className={`font-medium ${
+                          isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
                         Notifications
                       </h3>
                       <button
                         onClick={markAllAsRead}
-                        className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                        className={`text-xs ${
+                          isDarkMode
+                            ? "text-blue-400 hover:underline"
+                            : "text-blue-600 hover:underline"
+                        }`}
                       >
                         Mark all as read
                       </button>
@@ -653,22 +710,40 @@ const DashboardLayout = () => {
                       {notifications.map((notification) => (
                         <div
                           key={notification.id}
-                          className={`p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                          className={`p-3 border-b ${
+                            isDarkMode
+                              ? "border-gray-700 hover:bg-gray-700"
+                              : "border-gray-200 hover:bg-gray-50"
+                          } ${
                             !notification.read
-                              ? "bg-blue-50 dark:bg-blue-900/10"
+                              ? isDarkMode
+                                ? "bg-blue-900/10"
+                                : "bg-blue-50"
                               : ""
                           }`}
                         >
                           <div className="flex items-start gap-3">
                             {getNotificationIcon(notification.type)}
                             <div className="flex-1">
-                              <p className="font-medium text-gray-900 dark:text-white text-sm">
+                              <p
+                                className={`font-medium text-sm ${
+                                  isDarkMode ? "text-white" : "text-gray-900"
+                                }`}
+                              >
                                 {notification.title}
                               </p>
-                              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                              <p
+                                className={`text-sm ${
+                                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                                }`}
+                              >
                                 {notification.message}
                               </p>
-                              <p className="text-gray-500 dark:text-gray-500 text-xs mt-1">
+                              <p
+                                className={`text-xs mt-1 ${
+                                  isDarkMode ? "text-gray-500" : "text-gray-500"
+                                }`}
+                              >
                                 {notification.time}
                               </p>
                             </div>
@@ -677,26 +752,40 @@ const DashboardLayout = () => {
                       ))}
                     </div>
                     <div className="p-3 text-center">
-                      <button className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                      <button
+                        className={`text-sm ${
+                          isDarkMode
+                            ? "text-blue-400 hover:underline"
+                            : "text-blue-600 hover:underline"
+                        }`}
+                      >
                         View all notifications
                       </button>
                     </div>
                   </div>
                 )}
               </div>
-
               {/* Settings */}
-              <button className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+              <button
+                className={`p-2 rounded-lg ${
+                  isDarkMode
+                    ? "text-gray-300 hover:bg-gray-700"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
                 <Settings className="w-6 h-6" />
               </button>
-
               {/* Profile Dropdown */}
               <div className="relative">
                 <button
                   onClick={() =>
                     setIsProfileDropdownOpen(!isProfileDropdownOpen)
                   }
-                  className="flex items-center gap-2 p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  className={`flex items-center gap-2 p-2 rounded-lg ${
+                    isDarkMode
+                      ? "text-gray-300 hover:bg-gray-700"
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
                 >
                   {user?.displayName ? (
                     <img
@@ -705,41 +794,93 @@ const DashboardLayout = () => {
                       className="w-9 h-9 rounded-full border-2 border-pink-400 transition-all duration-300 hover:border-yellow-400"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
+                    <div
+                      className={`w-10 h-10 rounded-full ${
+                        isDarkMode ? "bg-blue-600" : "bg-blue-500"
+                      } flex items-center justify-center text-white font-medium`}
+                    >
                       <User className="w-5 h-5" />
                     </div>
                   )}
-
-                  <span className="hidden xl:block font-medium text-gray-900 dark:text-white">
+                  <span
+                    className={`hidden xl:block font-medium ${
+                      isDarkMode ? "text-white" : "text-gray-900"
+                    }`}
+                  >
                     {user?.displayName || "Guest User"}
                   </span>
                   <ChevronDown className="w-4 h-4" />
                 </button>
-
                 {/* Profile Dropdown Menu */}
                 {isProfileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-10">
-                    <div className="p-3 border-b border-gray-200 dark:border-gray-700">
-                      <p className="font-medium text-gray-900 dark:text-white">
+                  <div
+                    className={`absolute right-0 mt-2 w-48 rounded-lg shadow-lg border z-10 ${
+                      isDarkMode
+                        ? "bg-gray-800 border-gray-700"
+                        : "bg-white border-gray-200"
+                    }`}
+                  >
+                    <div
+                      className={`p-3 border-b ${
+                        isDarkMode ? "border-gray-700" : "border-gray-200"
+                      }`}
+                    >
+                      <p
+                        className={`font-medium ${
+                          isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
                         {user?.displayName || "Guest User"}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      <p
+                        className={`text-xs ${
+                          isDarkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
                         {user?.email || "guest@example.com"}
                       </p>
                     </div>
                     <div className="p-2">
-                      <button className="w-full text-left px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">
+                      <button
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
+                          isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
                         My Profile
                       </button>
-                      <button className="w-full text-left px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">
+                      <button
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
+                          isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
                         Account Settings
                       </button>
-                      <button className="w-full text-left px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm">
+                      <button
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
+                          isDarkMode
+                            ? "text-gray-300 hover:bg-gray-700"
+                            : "text-gray-700 hover:bg-gray-100"
+                        }`}
+                      >
                         Privacy & Security
                       </button>
                     </div>
-                    <div className="p-2 border-t border-gray-200 dark:border-gray-700">
-                      <button className="w-full text-left px-3 py-2 rounded-lg text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 text-sm">
+                    <div
+                      className={`p-2 border-t ${
+                        isDarkMode ? "border-gray-700" : "border-gray-200"
+                      }`}
+                    >
+                      <button
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm ${
+                          isDarkMode
+                            ? "text-red-400 hover:bg-red-900/20"
+                            : "text-red-600 hover:bg-red-50"
+                        }`}
+                      >
                         Sign Out
                       </button>
                     </div>
@@ -751,46 +892,16 @@ const DashboardLayout = () => {
 
           {/* Page Content */}
           <Outlet />
-          {/* <main className="flex-1 p-4 lg:p-6 overflow-auto">{children}</main> */}
 
-          {/* <footer className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div>
-                © {new Date().getFullYear()} Advance Health Service. All rights
-                reserved.
-              </div>
-              <div className="flex gap-4 mt-2 md:mt-0">
-                <a
-                  href="#"
-                  className="hover:text-blue-600 dark:hover:text-blue-400"
-                >
-                  Privacy Policy
-                </a>
-                <a
-                  href="#"
-                  className="hover:text-blue-600 dark:hover:text-blue-400"
-                >
-                  Terms of Service
-                </a>
-                <a
-                  href="#"
-                  className="hover:text-blue-600 dark:hover:text-blue-400"
-                >
-                  Contact Us
-                </a>
-              </div>
-            </div>
-          </footer> */}
+          {/* Overlay for mobile sidebar */}
+          {isSidebarOpen && (
+            <div
+              className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+              onClick={() => setIsSidebarOpen(false)}
+            ></div>
+          )}
         </div>
       </section>
-
-      {/* Overlay for mobile sidebar */}
-      {isSidebarOpen && (
-        <div
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={() => setIsSidebarOpen(false)}
-        ></div>
-      )}
     </div>
   );
 };

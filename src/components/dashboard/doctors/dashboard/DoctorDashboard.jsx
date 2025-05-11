@@ -13,11 +13,14 @@ import {
   Search,
   Plus,
 } from "react-feather";
+import useAuth from "../../../../hooks/useAuth";
+import LoadingSpinner from "../../../../extra/loaders/LoadingSpinner";
 
 // Doctor Dashboard Component
 const DoctorDashboard = () => {
   // State management
   const [activeTab, setActiveTab] = useState("appointments");
+  const { user, dbUser, isDarkMode } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [patients, setPatients] = useState([]);
   const [staff, setStaff] = useState([]);
@@ -315,11 +318,14 @@ const DoctorDashboard = () => {
     }
   };
 
+  if (!user || !dbUser) {
+    <LoadingSpinner />;
+  }
+
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
       <div className="drawer-content flex flex-col">
-
         {/* Main Content */}
         <main className="flex-1 p-4 md:p-6 bg-base-200 overflow-y-auto">
           {/* Doctor Info Card */}
@@ -329,13 +335,13 @@ const DoctorDashboard = () => {
                 <div className="avatar">
                   <div className="w-24 rounded-full">
                     <img
-                      src={doctor.image || "/placeholder.svg"}
+                      src={user?.photoURL || "/placeholder.svg"}
                       alt={doctor.name}
                     />
                   </div>
                 </div>
                 <div>
-                  <h2 className="card-title text-2xl">{doctor.name}</h2>
+                  <h2 className="card-title text-2xl">{user?.displayName}</h2>
                   <p className="text-lg">{doctor.specialty}</p>
                   <p className="text-base-content/70">{doctor.hospital}</p>
                 </div>
@@ -847,7 +853,7 @@ const DoctorDashboard = () => {
           )}
         </main>
       </div>
-      
+
       {/* Appointment Detail Modal */}
       <dialog id="appointment-modal" className="modal">
         <div className="modal-box max-w-3xl">

@@ -19,7 +19,7 @@ import LoadingSpinner from "../../extra/loaders/LoadingSpinner";
 
 export function BloodDonors() {
   const axiosPublic = useAxiosPublic();
-  const isDarkMode = true;
+  const { isDarkMode } = useAuth();
   const [allDonors, setAllDonors] = useState([]);
   const [filteredDonors, setFilteredDonors] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -354,88 +354,136 @@ function DonorsList({ donors }) {
       {donors.map((donor) => (
         <div
           key={donor.id}
-          className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700"
+          className={`rounded-lg shadow overflow-hidden border ${
+            isDarkMode
+              ? "bg-gray-800 border-gray-700"
+              : "bg-white border-gray-200"
+          }`}
         >
           <div className="p-4 pb-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                <div
+                  className={`relative w-10 h-10 rounded-full overflow-hidden ${
+                    isDarkMode ? "bg-gray-700" : "bg-gray-300"
+                  }`}
+                >
                   <img
                     src={donor.avatar || "/placeholder.svg"}
                     alt={donor.name}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.target.src = "/placeholder.svg?height=40&width=40";
+                      if (e.target.src !== "/placeholder.svg") {
+                        e.target.src = "/placeholder.svg";
+                      }
                     }}
                   />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium">{donor.name}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <h3
+                    className={`text-lg font-semibold ${
+                      isDarkMode ? "text-white" : "text-gray-800"
+                    }`}
+                  >
+                    {donor.name}
+                  </h3>
+                  <p
+                    className={`text-sm ${
+                      isDarkMode ? "text-gray-400" : "text-gray-600"
+                    }`}
+                  >
                     {donor.email}
                   </p>
                 </div>
               </div>
+
+              {/* Blood Type Badge */}
               <span
-                className={`
-                inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                ${
-                  donor.bloodType.includes("O")
-                    ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                    : ""
-                }
-                ${
-                  donor.bloodType.includes("A")
-                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                    : ""
-                }
-                ${
-                  donor.bloodType.includes("B")
-                    ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
-                    : ""
-                }
-                ${
-                  donor.bloodType.includes("AB")
-                    ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-                    : ""
-                }
-              `}
+                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  donor.bloodType === "O"
+                    ? isDarkMode
+                      ? "bg-green-900/30 text-green-300"
+                      : "bg-green-100 text-green-800"
+                    : donor.bloodType === "A"
+                    ? isDarkMode
+                      ? "bg-blue-900/30 text-blue-300"
+                      : "bg-blue-100 text-blue-800"
+                    : donor.bloodType === "B"
+                    ? isDarkMode
+                      ? "bg-purple-900/30 text-purple-300"
+                      : "bg-purple-100 text-purple-800"
+                    : isDarkMode
+                    ? "bg-amber-900/30 text-amber-300"
+                    : "bg-amber-100 text-amber-800"
+                }`}
               >
                 {donor.bloodType}
               </span>
             </div>
           </div>
+
           <div className="px-4 pb-2">
             <div className="grid gap-2 text-sm">
               <div className="flex items-center gap-2">
-                <Phone className="h-4 w-4 text-gray-400" />
-                <span className="text-gray-600 dark:text-gray-300">
+                <Phone
+                  className={`h-4 w-4 ${
+                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                />
+                <span
+                  className={isDarkMode ? "text-gray-300" : "text-gray-700"}
+                >
                   {donor.contact}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="h-4 w-4 text-gray-400" />
-                <span className="text-gray-600 dark:text-gray-300">
+                <MapPin
+                  className={`h-4 w-4 ${
+                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                />
+                <span
+                  className={isDarkMode ? "text-gray-300" : "text-gray-700"}
+                >
                   {donor.location}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-gray-400" />
-                <span className="text-gray-600 dark:text-gray-300">
+                <Calendar
+                  className={`h-4 w-4 ${
+                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                  }`}
+                />
+                <span
+                  className={isDarkMode ? "text-gray-300" : "text-gray-700"}
+                >
                   Last donation:{" "}
                   {new Date(donor.lastDonation).toLocaleDateString()}
                 </span>
               </div>
             </div>
           </div>
-          <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+
+          <div
+            className={`px-4 py-3 border-t ${
+              isDarkMode ? "border-gray-700" : "border-gray-200"
+            }`}
+          >
             {donor.eligibleToDonateDays > 0 ? (
-              <div className="flex items-center gap-1 text-green-600 dark:text-green-400 text-sm">
+              <div
+                className={`flex items-center gap-1 text-sm ${
+                  isDarkMode ? "text-green-400" : "text-green-700"
+                }`}
+              >
                 <Clock className="h-3 w-3" />
                 Eligible to donate in {donor.eligibleToDonateDays} days
               </div>
             ) : (
-              <div className="flex items-center gap-1 text-red-600 dark:text-red-400 text-sm">
+              <div
+                className={`flex items-center gap-1 text-sm ${
+                  isDarkMode ? "text-red-400" : "text-red-700"
+                }`}
+              >
                 <Droplet className="h-3 w-3" />
                 Eligible to donate now
               </div>
