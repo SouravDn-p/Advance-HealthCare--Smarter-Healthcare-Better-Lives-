@@ -34,6 +34,7 @@ import {
   FolderOpen,
   MessageCircleCode,
   FilePlus2,
+  Scan,
 } from "lucide-react";
 import { FiMessageSquare } from "react-icons/fi";
 import useAuth from "../hooks/useAuth";
@@ -125,10 +126,15 @@ const DashboardLayout = () => {
       icon: <FiMessageSquare className="w-5 h-5" />,
       section: "dashboard/consultation",
     },
+    // {
+    //   name: "Medications",
+    //   icon: <Pill className="w-5 h-5" />,
+    //   section: "dashboard/medications",
+    // },
     {
-      name: "Medications",
-      icon: <Pill className="w-5 h-5" />,
-      section: "dashboard/medications",
+      name: "reportScanner",
+      icon: <Scan className="w-5 h-5" />,
+      section: "dashboard/reportScanner",
     },
     {
       name: "AI Diagnosis",
